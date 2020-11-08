@@ -12,9 +12,9 @@
     <string name="menu_slideshow">Slideshow</string>
 
     <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
-    <string name="facebook_application_id" translatable="false">YOUR_APP_ID</string>
-    <string name="facebook_login_protocol_scheme" translatable="false">fbYOUR_APP_ID</string>
+    <string name="facebook_application_id" translatable="false">2826630187580441</string>
+    <string name="facebook_login_protocol_scheme" translatable="false">fb2826630187580441</string>
     <!-- Twitter consumer key and secret -->
-    <string name="twitter_consumer_key" translatable="false">YOUR_CONSUMER_KEY</string>
-    <string name="twitter_consumer_secret" translatable="false">YOUR_CONSUMER_SECRET</string>
+    <string name="twitter_consumer_key" translatable="false">19274023</string>
+    <string name="twitter_consumer_secret" translatable="false">iZg4dERcxefxlBPkmxgELw9J2taseixCWThU9b82iIK2A4PJZz</string>
 </resources>

@@ -34,7 +34,7 @@ public class Authentification extends AppCompatActivity {
         startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
-                        .setTheme(R.style.LoginTheme)
+                        .setLogo(R.drawable.ic_hot_food_in_a_bowl__2_)
                         .setAvailableProviders(providers)
                         .build(),
                 RC_SIGN_IN);
@@ -42,7 +42,7 @@ public class Authentification extends AppCompatActivity {
 
 
     }
-    /*@Override
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
@@ -60,7 +60,7 @@ public class Authentification extends AppCompatActivity {
             }
         }
     }
-    */
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setContentView(R.layout.authentication_activity);
