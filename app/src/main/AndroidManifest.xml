@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
+
         android:name="androidx.multidex.MultiDexApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_hot_food_in_a_bowl__2_"
@@ -21,6 +22,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".MainActivity"
+            android:theme="@style/Theme.Go4Lunch.NoActionBar"></activity>
+        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_application_id"/>
     </application>
 
 </manifest>

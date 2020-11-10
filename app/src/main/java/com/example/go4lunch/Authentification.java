@@ -2,6 +2,7 @@ package com.example.go4lunch;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
@@ -35,6 +36,7 @@ public class Authentification extends AppCompatActivity {
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
                         .setLogo(R.drawable.ic_hot_food_in_a_bowl__2_)
+                        .setTheme(R.style.LoginTheme)
                         .setAvailableProviders(providers)
                         .build(),
                 RC_SIGN_IN);
@@ -51,6 +53,8 @@ public class Authentification extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                Intent intent = new Intent(this,MainActivity.class);
+                startActivity(intent);
                 // ...
             } else {
                 // Sign in failed. If response is null the user canceled the
