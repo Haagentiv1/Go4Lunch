@@ -1,9 +1,12 @@
-package com.example.go4lunch;
+package com.example.go4lunch.views.activities;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+
+import com.example.go4lunch.MainActivity;
+import com.example.go4lunch.R;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 
@@ -53,7 +56,7 @@ public class Authentification extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                Intent intent = new Intent(this,MainActivity.class);
+                Intent intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
                 // ...
             } else {

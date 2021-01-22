@@ -3,23 +3,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_home">
+    app:startDestination="@+id/bottom_nav_map">
 
     <fragment
-        android:id="@+id/nav_home"
-        android:name="com.example.go4lunch.ui.home.HomeFragment"
-        android:label="@string/your_lunch"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/bottom_nav_map"
+        android:name="com.example.go4lunch.views.fragments.MapsFragment"
+        android:label="@string/nav_menu_map"
+        tools:layout="@layout/fragment_maps">
+
+    </fragment>
 
     <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.example.go4lunch.ui.gallery.GalleryFragment"
-        android:label="@string/settings"
-        tools:layout="@layout/fragment_gallery" />
+        android:id="@+id/bottom_nav_list"
+        android:name="com.example.go4lunch.views.fragments.ItemRestaurant"
+        android:label="@string/nav_menu_list"
+        tools:layout="@layout/fragment_item_list_restaurant">
+
+    </fragment>
 
     <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="com.example.go4lunch.ui.slideshow.SlideshowFragment"
-        android:label="@string/logout"
-        tools:layout="@layout/fragment_slideshow" />
+        android:id="@+id/bottom_nav_workmates"
+        android:name="com.example.go4lunch.views.fragments.WorkMatesListFragment"
+        android:label="@string/nav_menu_workmates"
+        tools:layout="@layout/fragment_item_list_workmates">
+
+    </fragment>
+
 </navigation>
