@@ -15,25 +15,7 @@ public class Viewport implements Serializable
     @SerializedName("southwest")
     @Expose
     private Southwest southwest;
-    private final static long serialVersionUID = 3222206992235127779L;
-
-    /**
-     * No args constructor for use in serialization
-     * 
-     */
-    public Viewport() {
-    }
-
-    /**
-     * 
-     * @param southwest
-     * @param northeast
-     */
-    public Viewport(Northeast northeast, Southwest southwest) {
-        super();
-        this.northeast = northeast;
-        this.southwest = southwest;
-    }
+    private final static long serialVersionUID = 7729837603116003442L;
 
     public Northeast getNortheast() {
         return northeast;
@@ -43,11 +25,6 @@ public class Viewport implements Serializable
         this.northeast = northeast;
     }
 
-    public Viewport withNortheast(Northeast northeast) {
-        this.northeast = northeast;
-        return this;
-    }
-
     public Southwest getSouthwest() {
         return southwest;
     }
@@ -55,12 +32,5 @@ public class Viewport implements Serializable
     public void setSouthwest(Southwest southwest) {
         this.southwest = southwest;
     }
-
-    public Viewport withSouthwest(Southwest southwest) {
-        this.southwest = southwest;
-        return this;
-    }
-
-
 
 }

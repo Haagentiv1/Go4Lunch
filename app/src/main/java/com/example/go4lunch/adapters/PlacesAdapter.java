@@ -1,13 +1,18 @@
 package com.example.go4lunch.adapters;
 
+import android.location.Location;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.RequestManager;
+import com.example.go4lunch.BuildConfig;
 import com.example.go4lunch.R;
 import com.example.go4lunch.models.NearbySearch.Result;
 
@@ -19,10 +24,17 @@ import butterknife.ButterKnife;
 
 public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder> {
 
-    private  List<Result> mPlaces;
-
-    public PlacesAdapter(@NonNull List<Result> places) {
+    private List<Result> mPlaces;
+    private RequestManager glide;
+    private Double userLatitude;
+    private Double userLongitude;
+    private Location userLocation = new Location("");
+    private Location placeLocation = new Location("");
+    public PlacesAdapter(@NonNull List<Result> places, RequestManager glide,Double userLatitude, Double userLongitude) {
         this.mPlaces = places;
+        this.glide = glide;
+        this.userLatitude = userLatitude;
+        this.userLongitude = userLongitude;
     }
 
     @Override
@@ -32,14 +44,36 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
         return new ViewHolder(view);
     }
 
+    public String getResult(int position){
+        return this.mPlaces.get(position).getPlaceId();
+    }
+
+    public float divideRating(Double rating){
+        return (float) ((rating / 5) * 3);
+    }
+
+    public String getDistanceBetweenUserLocationAndPlace(int adapterPosition){
+        userLocation.setLatitude(userLatitude);
+        userLocation.setLongitude(userLongitude);
+        placeLocation.setLatitude(mPlaces.get(adapterPosition).getGeometry().getLocation().getLat());
+        placeLocation.setLongitude(mPlaces.get(adapterPosition).getGeometry().getLocation().getLng());
+        float distanceInMeter = userLocation.distanceTo(placeLocation);
+        return String.valueOf(Math.round(distanceInMeter));
+    }
+
+
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mName.setText(mPlaces.get(position).getName());
         holder.mAddress.setText(mPlaces.get(position).getVicinity());
-        holder.mAddress.setText(mPlaces.get(position).getName());
+        holder.mRating.setRating(divideRating(mPlaces.get(position).getRating()));
+        holder.mRestaurantDistance.setText(String.format("%sm", getDistanceBetweenUserLocationAndPlace(position)));
+        //holder.mRestaurantOpenHour.setText(mPlaces.get(position).getOpeningHours().getOpenNow().toString());
+        glide.load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + mPlaces.get(position).getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.API_KEY).into(holder.mRestaurantPicture);
+
 
     }
-
+    //https://stackoverflow.com/questions/13524834/google-place-api-placedetails-photo-reference
 
 
     @Override
@@ -59,8 +93,17 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
         @BindView(R.id.text_restaurant_address)
         TextView mAddress;
 
-        @BindView(R.id.text_restaurant_rating)
-        TextView mRating;
+        @BindView(R.id.restaurant_ratingBar)
+        RatingBar mRating;
+
+        @BindView(R.id.picture_restaurant)
+        ImageView mRestaurantPicture;
+
+        @BindView(R.id.text_restaurant_distance)
+        TextView mRestaurantDistance;
+
+        @BindView(R.id.text_restaurant_openHour)
+        TextView mRestaurantOpenHour;
 
         public ViewHolder(View view) {
             super(view);

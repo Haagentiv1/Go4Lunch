@@ -22,7 +22,7 @@
             android:name=".views.activities.SettingsActivity"
             android:label="@string/title_activity_settings" />
         <activity
-            android:name=".views.activities.ScrollingActivity"
+            android:name=".views.activities.RestaurantDetailActivity"
             android:label="@string/title_activity_scrolling"
             android:theme="@style/Theme.Go4Lunch.NoActionBar" />
         <activity

@@ -40,41 +40,10 @@ public class Result implements Serializable
     @SerializedName("vicinity")
     @Expose
     private String vicinity;
-    private final static long serialVersionUID = 1975128445137513864L;
-
-    /**
-     * No args constructor for use in serialization
-     * 
-     */
-    public Result() {
-    }
-
-    /**
-     * 
-     * @param reference
-     * @param types
-     * @param icon
-     * @param name
-     * @param placeId
-     * @param geometry
-     * @param openingHours
-     * @param vicinity
-     * @param id
-     * @param photos
-     */
-    public Result(Geometry geometry, String icon, String id, String name, OpeningHours openingHours, List<Photo> photos, String placeId, String reference, List<String> types, String vicinity) {
-        super();
-        this.geometry = geometry;
-        this.icon = icon;
-        this.id = id;
-        this.name = name;
-        this.openingHours = openingHours;
-        this.photos = photos;
-        this.placeId = placeId;
-        this.reference = reference;
-        this.types = types;
-        this.vicinity = vicinity;
-    }
+    @SerializedName("rating")
+    @Expose
+    private Double rating;
+    private final static long serialVersionUID = -1125286648143736610L;
 
     public Geometry getGeometry() {
         return geometry;
@@ -82,11 +51,6 @@ public class Result implements Serializable
 
     public void setGeometry(Geometry geometry) {
         this.geometry = geometry;
-    }
-
-    public Result withGeometry(Geometry geometry) {
-        this.geometry = geometry;
-        return this;
     }
 
     public String getIcon() {
@@ -97,22 +61,12 @@ public class Result implements Serializable
         this.icon = icon;
     }
 
-    public Result withIcon(String icon) {
-        this.icon = icon;
-        return this;
-    }
-
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public Result withId(String id) {
-        this.id = id;
-        return this;
     }
 
     public String getName() {
@@ -123,22 +77,12 @@ public class Result implements Serializable
         this.name = name;
     }
 
-    public Result withName(String name) {
-        this.name = name;
-        return this;
-    }
-
     public OpeningHours getOpeningHours() {
         return openingHours;
     }
 
     public void setOpeningHours(OpeningHours openingHours) {
         this.openingHours = openingHours;
-    }
-
-    public Result withOpeningHours(OpeningHours openingHours) {
-        this.openingHours = openingHours;
-        return this;
     }
 
     public List<Photo> getPhotos() {
@@ -149,22 +93,12 @@ public class Result implements Serializable
         this.photos = photos;
     }
 
-    public Result withPhotos(List<Photo> photos) {
-        this.photos = photos;
-        return this;
-    }
-
     public String getPlaceId() {
         return placeId;
     }
 
     public void setPlaceId(String placeId) {
         this.placeId = placeId;
-    }
-
-    public Result withPlaceId(String placeId) {
-        this.placeId = placeId;
-        return this;
     }
 
     public String getReference() {
@@ -175,22 +109,12 @@ public class Result implements Serializable
         this.reference = reference;
     }
 
-    public Result withReference(String reference) {
-        this.reference = reference;
-        return this;
-    }
-
     public List<String> getTypes() {
         return types;
     }
 
     public void setTypes(List<String> types) {
         this.types = types;
-    }
-
-    public Result withTypes(List<String> types) {
-        this.types = types;
-        return this;
     }
 
     public String getVicinity() {
@@ -201,9 +125,12 @@ public class Result implements Serializable
         this.vicinity = vicinity;
     }
 
-    public Result withVicinity(String vicinity) {
-        this.vicinity = vicinity;
-        return this;
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
     }
 
 }

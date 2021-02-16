@@ -73,5 +73,8 @@
     <string name="latitude">25.0805</string>
     <string name="longitude">55.1403</string>
     <string name="search">Search</string>
+    <string name="call">CALL</string>
+    <string name="like">LIKE</string>
+    <string name="website">WEBSITE</string>
 
 </resources>

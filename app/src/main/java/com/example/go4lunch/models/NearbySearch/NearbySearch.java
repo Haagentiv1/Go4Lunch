@@ -1,10 +1,11 @@
 
 package com.example.go4lunch.models.NearbySearch;
 
-import java.io.Serializable;
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+import java.util.List;
 
 public class NearbySearch implements Serializable
 {
@@ -18,27 +19,7 @@ public class NearbySearch implements Serializable
     @SerializedName("status")
     @Expose
     private String status;
-    private final static long serialVersionUID = -1542380884257775035L;
-
-    /**
-     * No args constructor for use in serialization
-     * 
-     */
-    public NearbySearch() {
-    }
-
-    /**
-     * 
-     * @param htmlAttributions
-     * @param results
-     * @param status
-     */
-    public NearbySearch(List<Object> htmlAttributions, List<Result> results, String status) {
-        super();
-        this.htmlAttributions = htmlAttributions;
-        this.results = results;
-        this.status = status;
-    }
+    private final static long serialVersionUID = -5896518463948989725L;
 
     public List<Object> getHtmlAttributions() {
         return htmlAttributions;
@@ -46,11 +27,6 @@ public class NearbySearch implements Serializable
 
     public void setHtmlAttributions(List<Object> htmlAttributions) {
         this.htmlAttributions = htmlAttributions;
-    }
-
-    public NearbySearch withHtmlAttributions(List<Object> htmlAttributions) {
-        this.htmlAttributions = htmlAttributions;
-        return this;
     }
 
     public List<Result> getResults() {
@@ -61,22 +37,12 @@ public class NearbySearch implements Serializable
         this.results = results;
     }
 
-    public NearbySearch withResults(List<Result> results) {
-        this.results = results;
-        return this;
-    }
-
     public String getStatus() {
         return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public NearbySearch withStatus(String status) {
-        this.status = status;
-        return this;
     }
 
 }

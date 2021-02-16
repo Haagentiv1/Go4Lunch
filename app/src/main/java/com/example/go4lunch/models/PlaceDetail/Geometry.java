@@ -15,25 +15,7 @@ public class Geometry implements Serializable
     @SerializedName("viewport")
     @Expose
     private Viewport viewport;
-    private final static long serialVersionUID = -213837210420327671L;
-
-    /**
-     * No args constructor for use in serialization
-     * 
-     */
-    public Geometry() {
-    }
-
-    /**
-     * 
-     * @param viewport
-     * @param location
-     */
-    public Geometry(Location location, Viewport viewport) {
-        super();
-        this.location = location;
-        this.viewport = viewport;
-    }
+    private final static long serialVersionUID = -9033731485239778665L;
 
     public Location getLocation() {
         return location;
@@ -43,11 +25,6 @@ public class Geometry implements Serializable
         this.location = location;
     }
 
-    public Geometry withLocation(Location location) {
-        this.location = location;
-        return this;
-    }
-
     public Viewport getViewport() {
         return viewport;
     }
@@ -55,11 +32,5 @@ public class Geometry implements Serializable
     public void setViewport(Viewport viewport) {
         this.viewport = viewport;
     }
-
-    public Geometry withViewport(Viewport viewport) {
-        this.viewport = viewport;
-        return this;
-    }
-
 
 }

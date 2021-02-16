@@ -15,31 +15,11 @@ public class PlaceDetail implements Serializable
     private List<Object> htmlAttributions = null;
     @SerializedName("result")
     @Expose
-    private Result result;
+    private PlaceDetailResult result;
     @SerializedName("status")
     @Expose
     private String status;
-    private final static long serialVersionUID = 4786592364802666884L;
-
-    /**
-     * No args constructor for use in serialization
-     * 
-     */
-    public PlaceDetail() {
-    }
-
-    /**
-     * 
-     * @param result
-     * @param htmlAttributions
-     * @param status
-     */
-    public PlaceDetail(List<Object> htmlAttributions, Result result, String status) {
-        super();
-        this.htmlAttributions = htmlAttributions;
-        this.result = result;
-        this.status = status;
-    }
+    private final static long serialVersionUID = -2513869471756533863L;
 
     public List<Object> getHtmlAttributions() {
         return htmlAttributions;
@@ -49,22 +29,12 @@ public class PlaceDetail implements Serializable
         this.htmlAttributions = htmlAttributions;
     }
 
-    public PlaceDetail withHtmlAttributions(List<Object> htmlAttributions) {
-        this.htmlAttributions = htmlAttributions;
-        return this;
-    }
-
-    public Result getResult() {
+    public PlaceDetailResult getResult() {
         return result;
     }
 
-    public void setResult(Result result) {
+    public void setResult(PlaceDetailResult result) {
         this.result = result;
-    }
-
-    public PlaceDetail withResult(Result result) {
-        this.result = result;
-        return this;
     }
 
     public String getStatus() {
@@ -73,11 +43,6 @@ public class PlaceDetail implements Serializable
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public PlaceDetail withStatus(String status) {
-        this.status = status;
-        return this;
     }
 
 }

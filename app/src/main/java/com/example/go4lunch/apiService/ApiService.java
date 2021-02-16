@@ -24,8 +24,7 @@ public interface ApiService {
     @GET("autocomplete/json?key="+key)
     Observable<PlaceAutocomplete> getPlaceAutoComplete(@Query("input")String input,
                                                        @Query("location")String location,
-                                                       @Query("radius")String radius,
-                                                       @Query("type")String type);
+                                                       @Query("radius")Integer radius);
 
 
 

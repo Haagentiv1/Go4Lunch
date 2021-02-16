@@ -32,20 +32,11 @@ public class Go4LunchStreams {
                 timeout(10,TimeUnit.SECONDS);
     }
 
-    public static Observable<PlaceAutocomplete> streamFetchAutocomplete(String input,String location, String radius, String type){
+    public static Observable<PlaceAutocomplete> streamFetchAutocomplete(String input,String location,int radius){
         ApiService apiService = RetrofitService.retrofit.create(ApiService.class);
-        return apiService.getPlaceAutoComplete(input, location, radius, type).
+        return apiService.getPlaceAutoComplete(input,location,radius).
                 subscribeOn(Schedulers.io()).
                 observeOn(AndroidSchedulers.mainThread()).
                 timeout(10,TimeUnit.SECONDS);
     }
-
-
-
-
-
-
-
-
-
 }

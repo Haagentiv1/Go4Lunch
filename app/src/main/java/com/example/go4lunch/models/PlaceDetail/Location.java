@@ -15,25 +15,7 @@ public class Location implements Serializable
     @SerializedName("lng")
     @Expose
     private Double lng;
-    private final static long serialVersionUID = -3524839131348193058L;
-
-    /**
-     * No args constructor for use in serialization
-     * 
-     */
-    public Location() {
-    }
-
-    /**
-     * 
-     * @param lng
-     * @param lat
-     */
-    public Location(Double lat, Double lng) {
-        super();
-        this.lat = lat;
-        this.lng = lng;
-    }
+    private final static long serialVersionUID = -5299537703656356528L;
 
     public Double getLat() {
         return lat;
@@ -43,11 +25,6 @@ public class Location implements Serializable
         this.lat = lat;
     }
 
-    public Location withLat(Double lat) {
-        this.lat = lat;
-        return this;
-    }
-
     public Double getLng() {
         return lng;
     }
@@ -55,11 +32,5 @@ public class Location implements Serializable
     public void setLng(Double lng) {
         this.lng = lng;
     }
-
-    public Location withLng(Double lng) {
-        this.lng = lng;
-        return this;
-    }
-
 
 }

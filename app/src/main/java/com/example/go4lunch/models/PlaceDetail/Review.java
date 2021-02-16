@@ -33,37 +33,7 @@ public class Review implements Serializable
     @SerializedName("time")
     @Expose
     private Integer time;
-    private final static long serialVersionUID = 881193899224021572L;
-
-    /**
-     * No args constructor for use in serialization
-     * 
-     */
-    public Review() {
-    }
-
-    /**
-     * 
-     * @param authorName
-     * @param authorUrl
-     * @param rating
-     * @param relativeTimeDescription
-     * @param language
-     * @param text
-     * @param time
-     * @param profilePhotoUrl
-     */
-    public Review(String authorName, String authorUrl, String language, String profilePhotoUrl, Integer rating, String relativeTimeDescription, String text, Integer time) {
-        super();
-        this.authorName = authorName;
-        this.authorUrl = authorUrl;
-        this.language = language;
-        this.profilePhotoUrl = profilePhotoUrl;
-        this.rating = rating;
-        this.relativeTimeDescription = relativeTimeDescription;
-        this.text = text;
-        this.time = time;
-    }
+    private final static long serialVersionUID = 6043259597504883158L;
 
     public String getAuthorName() {
         return authorName;
@@ -71,11 +41,6 @@ public class Review implements Serializable
 
     public void setAuthorName(String authorName) {
         this.authorName = authorName;
-    }
-
-    public Review withAuthorName(String authorName) {
-        this.authorName = authorName;
-        return this;
     }
 
     public String getAuthorUrl() {
@@ -86,22 +51,12 @@ public class Review implements Serializable
         this.authorUrl = authorUrl;
     }
 
-    public Review withAuthorUrl(String authorUrl) {
-        this.authorUrl = authorUrl;
-        return this;
-    }
-
     public String getLanguage() {
         return language;
     }
 
     public void setLanguage(String language) {
         this.language = language;
-    }
-
-    public Review withLanguage(String language) {
-        this.language = language;
-        return this;
     }
 
     public String getProfilePhotoUrl() {
@@ -112,22 +67,12 @@ public class Review implements Serializable
         this.profilePhotoUrl = profilePhotoUrl;
     }
 
-    public Review withProfilePhotoUrl(String profilePhotoUrl) {
-        this.profilePhotoUrl = profilePhotoUrl;
-        return this;
-    }
-
     public Integer getRating() {
         return rating;
     }
 
     public void setRating(Integer rating) {
         this.rating = rating;
-    }
-
-    public Review withRating(Integer rating) {
-        this.rating = rating;
-        return this;
     }
 
     public String getRelativeTimeDescription() {
@@ -138,22 +83,12 @@ public class Review implements Serializable
         this.relativeTimeDescription = relativeTimeDescription;
     }
 
-    public Review withRelativeTimeDescription(String relativeTimeDescription) {
-        this.relativeTimeDescription = relativeTimeDescription;
-        return this;
-    }
-
     public String getText() {
         return text;
     }
 
     public void setText(String text) {
         this.text = text;
-    }
-
-    public Review withText(String text) {
-        this.text = text;
-        return this;
     }
 
     public Integer getTime() {
@@ -164,8 +99,4 @@ public class Review implements Serializable
         this.time = time;
     }
 
-    public Review withTime(Integer time) {
-        this.time = time;
-        return this;
-    }
 }

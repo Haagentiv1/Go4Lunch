@@ -23,7 +23,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.api.UserHelper;
 import com.example.go4lunch.views.activities.Authentification;
-import com.example.go4lunch.views.activities.ScrollingActivity;
+import com.example.go4lunch.views.activities.RestaurantDetailActivity;
 import com.example.go4lunch.views.activities.SettingsActivity;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -177,7 +177,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_your_lunch:
-                Intent intent = new Intent(this, ScrollingActivity.class);
+                Intent intent = new Intent(this, RestaurantDetailActivity.class);
                 startActivity(intent);
                 break;
 

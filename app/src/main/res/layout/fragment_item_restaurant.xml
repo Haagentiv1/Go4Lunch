@@ -1,48 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:id="@+id/restaurant_item">
     <RelativeLayout
         android:id="@+id/Texte"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="100dp">
 
-    <TextView
-        android:id="@+id/text_restaurant_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="LeZinc"
-        android:textAppearance="?attr/textAppearanceListItem" />
+            <TextView
+                android:id="@+id/text_restaurant_name"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:text="LeZinc"
+                android:ellipsize="end"
+                android:textStyle="bold"
+                android:textAppearance="?attr/textAppearanceListItem"
+                android:singleLine="true"/>
 
-    <TextView
-        android:id="@+id/text_restaurant_address"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:textAppearance="?attr/textAppearanceListItem"
-        android:text="French - 12 rue du Faubourg Poissoniere"
-        android:layout_below="@id/text_restaurant_name"/>
+            <TextView
+                android:id="@+id/text_restaurant_address"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:ellipsize="end"
+                android:textAppearance="?attr/textAppearanceListItem"
+                android:layout_below="@id/text_restaurant_name"
+                android:text="French -"
+                android:singleLine="true" />
+            <TextView
+                android:id="@+id/text_restaurant_openHour"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Open until 2.30pm"
+                android:layout_margin="4dp"
+                android:textStyle="italic"
+                android:layout_below="@id/text_restaurant_address"/>
+            <TextView
+                android:id="@+id/text_restaurant_distance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:text="120m"
+                android:layout_toStartOf="@id/picture_restaurant" />
 
-    <TextView
-        android:id="@+id/text_restaurant_rating"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:textAppearance="?attr/textAppearanceListItem"
-        android:text="Open until 2:30pm"
-        android:layout_below="@+id/text_restaurant_address"/>
-    </RelativeLayout>
-    <RelativeLayout
-        android:id="@+id/image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        >
         <ImageView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:nextFocusRight="@id/restaurant_item"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="31dp"
+            android:layout_toStartOf="@id/restaurant_workmates"
+            android:src="@drawable/ic_baseline_person_outline_24" />
+
+        <TextView
+                android:id="@+id/restaurant_workmates"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="(2)"
+                android:layout_margin="4dp"
+                android:layout_below="@id/text_restaurant_distance"
+                android:layout_toStartOf="@id/picture_restaurant"
+                />
+        <androidx.appcompat.widget.AppCompatRatingBar
+            android:id="@+id/restaurant_ratingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="3"
+            android:layout_toStartOf="@id/picture_restaurant"
+            android:layout_below="@id/restaurant_workmates"
+            android:layout_margin="4dp"
+            android:rating="3"
+            android:progressTint="@color/yellow_gold"
+            android:progressBackgroundTint="@color/gray_light"
+            style="?android:attr/ratingBarStyleSmall"/>
+
+        <ImageView
+            android:id="@+id/picture_restaurant"
+            android:layout_width="90dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"/>
+
     </RelativeLayout>
-</LinearLayout>
+
+</androidx.cardview.widget.CardView>

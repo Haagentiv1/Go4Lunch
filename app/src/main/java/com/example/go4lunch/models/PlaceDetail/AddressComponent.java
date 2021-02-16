@@ -19,27 +19,7 @@ public class AddressComponent implements Serializable
     @SerializedName("types")
     @Expose
     private List<String> types = null;
-    private final static long serialVersionUID = 7960350888459893187L;
-
-    /**
-     * No args constructor for use in serialization
-     * 
-     */
-    public AddressComponent() {
-    }
-
-    /**
-     * 
-     * @param types
-     * @param shortName
-     * @param longName
-     */
-    public AddressComponent(String longName, String shortName, List<String> types) {
-        super();
-        this.longName = longName;
-        this.shortName = shortName;
-        this.types = types;
-    }
+    private final static long serialVersionUID = 6765538270218164017L;
 
     public String getLongName() {
         return longName;
@@ -47,11 +27,6 @@ public class AddressComponent implements Serializable
 
     public void setLongName(String longName) {
         this.longName = longName;
-    }
-
-    public AddressComponent withLongName(String longName) {
-        this.longName = longName;
-        return this;
     }
 
     public String getShortName() {
@@ -62,11 +37,6 @@ public class AddressComponent implements Serializable
         this.shortName = shortName;
     }
 
-    public AddressComponent withShortName(String shortName) {
-        this.shortName = shortName;
-        return this;
-    }
-
     public List<String> getTypes() {
         return types;
     }
@@ -74,12 +44,5 @@ public class AddressComponent implements Serializable
     public void setTypes(List<String> types) {
         this.types = types;
     }
-
-    public AddressComponent withTypes(List<String> types) {
-        this.types = types;
-        return this;
-    }
-
-
 
 }

@@ -21,29 +21,7 @@ public class Photo implements Serializable
     @SerializedName("width")
     @Expose
     private Integer width;
-    private final static long serialVersionUID = -3227984247535125233L;
-
-    /**
-     * No args constructor for use in serialization
-     * 
-     */
-    public Photo() {
-    }
-
-    /**
-     * 
-     * @param htmlAttributions
-     * @param photoReference
-     * @param width
-     * @param height
-     */
-    public Photo(Integer height, List<Object> htmlAttributions, String photoReference, Integer width) {
-        super();
-        this.height = height;
-        this.htmlAttributions = htmlAttributions;
-        this.photoReference = photoReference;
-        this.width = width;
-    }
+    private final static long serialVersionUID = 8895822592030835138L;
 
     public Integer getHeight() {
         return height;
@@ -51,11 +29,6 @@ public class Photo implements Serializable
 
     public void setHeight(Integer height) {
         this.height = height;
-    }
-
-    public Photo withHeight(Integer height) {
-        this.height = height;
-        return this;
     }
 
     public List<Object> getHtmlAttributions() {
@@ -66,11 +39,6 @@ public class Photo implements Serializable
         this.htmlAttributions = htmlAttributions;
     }
 
-    public Photo withHtmlAttributions(List<Object> htmlAttributions) {
-        this.htmlAttributions = htmlAttributions;
-        return this;
-    }
-
     public String getPhotoReference() {
         return photoReference;
     }
@@ -79,22 +47,12 @@ public class Photo implements Serializable
         this.photoReference = photoReference;
     }
 
-    public Photo withPhotoReference(String photoReference) {
-        this.photoReference = photoReference;
-        return this;
-    }
-
     public Integer getWidth() {
         return width;
     }
 
     public void setWidth(Integer width) {
         this.width = width;
-    }
-
-    public Photo withWidth(Integer width) {
-        this.width = width;
-        return this;
     }
 
 }

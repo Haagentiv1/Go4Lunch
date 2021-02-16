@@ -1,5 +1,6 @@
 package com.example.go4lunch.views.fragments;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -19,39 +20,48 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.adapters.PlacesAdapter;
 import com.example.go4lunch.models.NearbySearch.NearbySearch;
 import com.example.go4lunch.models.NearbySearch.Result;
+import com.example.go4lunch.models.PlaceAutocomplete.PlaceAutocomplete;
+import com.example.go4lunch.models.PlaceAutocomplete.Prediction;
+import com.example.go4lunch.models.PlaceDetail.PlaceDetail;
 import com.example.go4lunch.presenters.Go4LunchStreams;
+import com.example.go4lunch.views.activities.RestaurantDetailActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.net.PlacesClient;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindInt;
+import butterknife.BindString;
+import butterknife.ButterKnife;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 
 
-public class MapsFragment extends Fragment implements OnMapReadyCallback {
+public class MapsFragment extends Fragment implements OnMapReadyCallback, LocationSource.OnLocationChangedListener {
 
     private static final String TAG = MapsFragment.class.getSimpleName();
     private GoogleMap map;
     private CameraPosition cameraPosition;
 
     // The entry point to the Places API.
-    private PlacesClient placesClient;
 
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -67,13 +77,17 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     // location retrieved by the Fused Location Provider.
     private Location lastKnownLocation;
 
+    @BindString(R.string.type)
+    public String type;
+    @BindInt(R.integer.radius)
+    public int radius;
+
     private Disposable mDisposable;
-    private List<Result> mRestaurants;
+    private List<Result> mRestaurants = new ArrayList<>();
     private Marker mMarker;
-
-
-
-
+    private String mLocation;
+    private List<Prediction> mPredictionList;
+    int SEARCH_QUERY_THRESHOLD = 3;
 
 
     @Nullable
@@ -82,20 +96,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        return inflater.inflate(R.layout.fragment_maps, container, false);
+        View view = inflater.inflate(R.layout.fragment_maps, container, false);
+        ButterKnife.bind(this, view);
+        return view;
 
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-
-        // Construct a PlacesClient
-        Places.initialize(getActivity(), getString(R.string.google_api_key));
-        placesClient = Places.createClient(getActivity());
-
-
         // Construct a FusedLocationProviderClient.
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
@@ -103,29 +112,42 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         SupportMapFragment mMapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
         mMapFragment.getMapAsync(this);
+
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
-        inflater.inflate(R.menu.search_view,menu);
+        inflater.inflate(R.menu.search_view, menu);
         MenuItem item = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) item.getActionView();
-        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW|MenuItem.SHOW_AS_ACTION_IF_ROOM);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                if (query.length() >= SEARCH_QUERY_THRESHOLD){
+                     executeAutocompleteHttpRequestWithRetrofit(query);
+
+                }
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                return false;
+                if (newText.length() >= SEARCH_QUERY_THRESHOLD){
+                    executeAutocompleteHttpRequestWithRetrofit(newText);
+
+                }
+                return true;
             }
         });
     }
-
 
     /**
      * Gets the current location of the device, and positions the map's camera.
@@ -146,10 +168,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
                             lastKnownLocation = task.getResult();
+                            mLocation = lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude();
+                            Log.e("TAG", "Location/devicelocation" + mLocation);
+                            executeHttpRequestWithRetrofit(mLocation);
                             if (lastKnownLocation != null) {
                                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                         new LatLng(lastKnownLocation.getLatitude(),
                                                 lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                                Log.e("TAG", "Location/devicelocation" + mLocation);
                             }
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
@@ -161,10 +187,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                     }
                 });
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage(), e);
         }
     }
+
 
 
 
@@ -174,14 +201,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         }
         try {
             if (locationPermissionGranted) {
-                map.setMapStyle(new MapStyleOptions(getResources()
-                        .getString(R.string.style_json)));
                 map.setMyLocationEnabled(true);
                 map.getUiSettings().setMyLocationButtonEnabled(true);
-
+                map.setMapStyle(MapStyleOptions.loadRawResourceStyle(getActivity().getApplicationContext(),R.raw.style_json));
             } else {
-                map.setMapStyle(new MapStyleOptions(getResources()
-                        .getString(R.string.style_json)));
                 map.setMyLocationEnabled(false);
                 map.getUiSettings().setMyLocationButtonEnabled(false);
                 lastKnownLocation = null;
@@ -207,6 +230,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             }
         }
         updateLocationUI();
+        getDeviceLocation();
     }
 
 
@@ -228,19 +252,46 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    private void executeHttpRequestWithRetrofit(){
-        mDisposable = Go4LunchStreams.streamFetchRestaurants(mLocation,radius,type).subscribeWith(new DisposableObserver<NearbySearch>() {
-
-            @Override
-            public void onNext(@io.reactivex.rxjava3.annotations.NonNull NearbySearch nearbySearch) {
-                Log.e("Tag", "OnNext"+nearbySearch.getStatus());
-
-                mRestaurants.addAll(nearbySearch.getResults());
-
-                Log.e("Tag","Result"+mRestaurants.size());
-
+    private void displayNearbyRestaurantMarker(List<Result> results){
+        if (map != null) {
+            for (Result result : results) {
+                 MarkerOptions options = new MarkerOptions().position(new LatLng(result.getGeometry().getLocation().getLat(), result.getGeometry().getLocation().getLng()))
+                        .title(result.getName())
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.background_lunch));
+                 map.addMarker(options).setTag(result.getPlaceId());
+                 Log.e("testId","testid" + result.getPlaceId());
+                Log.e("testmarker","loc" + result.getGeometry().getLocation().getLat()+ result.getGeometry().getLocation().getLng());
             }
 
+        }else {
+            for (Result result : results) {
+                MarkerOptions options = new MarkerOptions().position(new LatLng(result.getGeometry().getLocation().getLat(), result.getGeometry().getLocation().getLng()))
+                        .title(result.getName())
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.background_lunch));
+                map.addMarker(options).setTag(result.getId());
+            }
+        }
+        map.setOnInfoWindowClickListener(marker -> {
+            String placeId = (String) marker.getTag();
+            Intent intent = new Intent(getActivity(), RestaurantDetailActivity.class);
+            intent.putExtra("placeID",placeId);
+            startActivity(intent);
+        });
+
+    }
+
+
+
+    public void executeAutocompleteHttpRequestWithRetrofit(String query){
+        Disposable disposable = Go4LunchStreams.streamFetchAutocomplete(query,mLocation,radius).subscribeWith(new DisposableObserver<PlaceAutocomplete>() {
+            @Override
+            public void onNext(@io.reactivex.rxjava3.annotations.NonNull PlaceAutocomplete placeAutocomplete) {
+                mPredictionList = placeAutocomplete.getPredictions();
+                Log.e("Tag",query + "test" + placeAutocomplete.getPredictions().get(0).getDescription());
+                String placeID = placeAutocomplete.getPredictions().get(0).getPlaceId();
+                executeHttpRequestForRetrievePlaceDetailData(placeID);
+
+            }
             @Override
             public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
 
@@ -249,34 +300,85 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onComplete() {
 
+            }
+        });
+    }
+
+    public void executeHttpRequestWithRetrofit(String location){
+        Log.e("TAG","LocationOnHttpRequest" + location);
+        Disposable disposable = Go4LunchStreams.streamFetchRestaurants(location,radius,type).subscribeWith(new DisposableObserver<NearbySearch>() {
+            @Override
+            public void onNext(@NotNull NearbySearch nearbySearch) {
+                Log.e("MapFragmentNearbyList","sizeList :" + nearbySearch.getResults().size());
+                mRestaurants.addAll(nearbySearch.getResults());
+                displayNearbyRestaurantMarker(mRestaurants);
+                Log.e("TAG","RestaurantListInHttpRequest" + mRestaurants.size());
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
 
             }
         });
     }
 
+    private void executeHttpRequestForRetrievePlaceDetailData(String placeID){
+        Disposable disposable = Go4LunchStreams.streamFetchDetails(placeID).subscribeWith(new DisposableObserver<PlaceDetail>() {
+            @Override
+            public void onNext(@io.reactivex.rxjava3.annotations.NonNull PlaceDetail placeDetail) {
+                Double latitude = placeDetail.getResult().getGeometry().getLocation().getLat();
+                Double longitude = placeDetail.getResult().getGeometry().getLocation().getLng();
+                String searchLocation = (latitude + "," + longitude);
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),DEFAULT_ZOOM));
+                executeHttpRequestWithRetrofit(searchLocation);
 
+            }
+
+            @Override
+            public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                Log.e("error","error" + e);
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+
+    }
 
 
 
 
     @Override
     public void onMapReady(GoogleMap map) {
-
         this.map = map;
         getLocationPermission();
-
         updateLocationUI();
+        getDeviceLocation();
+        executeHttpRequestWithRetrofit(mLocation);
+        Log.e("test","onmapready");
+
+
+
+
 
         // Get the current location of the device and set the position of the map.
-        getDeviceLocation();
-
-
 
     }
 
+    @Override
+    public void onLocationChanged(Location location) {
 
 
 
+        Log.e("onLocationChanged", "test" + location);
 
-
+    }
 }

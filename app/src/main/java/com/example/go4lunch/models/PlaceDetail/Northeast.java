@@ -15,25 +15,7 @@ public class Northeast implements Serializable
     @SerializedName("lng")
     @Expose
     private Double lng;
-    private final static long serialVersionUID = 8928779161256646967L;
-
-    /**
-     * No args constructor for use in serialization
-     * 
-     */
-    public Northeast() {
-    }
-
-    /**
-     * 
-     * @param lng
-     * @param lat
-     */
-    public Northeast(Double lat, Double lng) {
-        super();
-        this.lat = lat;
-        this.lng = lng;
-    }
+    private final static long serialVersionUID = 2400571819099615702L;
 
     public Double getLat() {
         return lat;
@@ -43,11 +25,6 @@ public class Northeast implements Serializable
         this.lat = lat;
     }
 
-    public Northeast withLat(Double lat) {
-        this.lat = lat;
-        return this;
-    }
-
     public Double getLng() {
         return lng;
     }
@@ -55,11 +32,5 @@ public class Northeast implements Serializable
     public void setLng(Double lng) {
         this.lng = lng;
     }
-
-    public Northeast withLng(Double lng) {
-        this.lng = lng;
-        return this;
-    }
-
 
 }

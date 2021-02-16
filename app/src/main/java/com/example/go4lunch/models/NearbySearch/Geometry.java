@@ -1,9 +1,10 @@
 
 package com.example.go4lunch.models.NearbySearch;
 
-import java.io.Serializable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
 
 public class Geometry implements Serializable
 {
@@ -11,23 +12,7 @@ public class Geometry implements Serializable
     @SerializedName("location")
     @Expose
     private Location location;
-    private final static long serialVersionUID = -4374744437294788404L;
-
-    /**
-     * No args constructor for use in serialization
-     * 
-     */
-    public Geometry() {
-    }
-
-    /**
-     * 
-     * @param location
-     */
-    public Geometry(Location location) {
-        super();
-        this.location = location;
-    }
+    private final static long serialVersionUID = -643221327948862509L;
 
     public Location getLocation() {
         return location;
@@ -35,11 +20,6 @@ public class Geometry implements Serializable
 
     public void setLocation(Location location) {
         this.location = location;
-    }
-
-    public Geometry withLocation(Location location) {
-        this.location = location;
-        return this;
     }
 
 }
