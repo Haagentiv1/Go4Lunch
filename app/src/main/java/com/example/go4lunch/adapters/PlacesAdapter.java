@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
+import com.example.go4lunch.BuildConfig;
 import com.example.go4lunch.R;
 import com.example.go4lunch.models.NearbySearch.Result;
 
@@ -80,7 +81,9 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
         holder.mRating.setRating(divideRating(mPlaces.get(position).getRating()));
         holder.mRestaurantDistance.setText(String.format("%sm", getDistanceBetweenUserLocationAndPlace(position)));
         //holder.mRestaurantOpenHour.setText(mPlaces.get(position).getOpeningHours().getOpenNow().toString());
-        //glide.load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + mPlaces.get(position).getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.API_KEY).into(holder.mRestaurantPicture);
+        if (mPlaces.get(position).getPhotos() != null && !mPlaces.get(position).getPhotos().isEmpty()){
+            glide.load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + mPlaces.get(position).getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.API_KEY).into(holder.mRestaurantPicture);
+             }else {holder.mRestaurantPicture.setImageResource(R.drawable.image_not_available);}
 
 
     }

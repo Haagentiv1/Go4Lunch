@@ -12,9 +12,9 @@
     <string name="settings">SETTINGS</string>
     <string name="logout">LOGOUT</string>
     // BOTTOM NAVIGATION
-    <string name="nav_menu_map">Map view</string>
-    <string name="nav_menu_list">List View</string>
-    <string name="nav_menu_workmates">Workmates</string>
+    <string name="nav_menu_map">I\'m Hungry!</string>
+    <string name="nav_menu_list">I\'m Hungry</string>
+    <string name="nav_menu_workmates">Available Workmates</string>
 
     <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
     <string name="facebook_application_id" translatable="false">2826630187580441</string>
