@@ -60,6 +60,8 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.google.firebase:firebase-firestore'
     implementation 'com.firebaseui:firebase-ui-firestore:7.1.1'
+    implementation 'com.google.firebase:firebase-messaging:21.0.1'
+
 
     //FACEBOOK AUTHENTICATION
     // Find the latest Facebook SDK releases here: https://goo.gl/Ce5L94
