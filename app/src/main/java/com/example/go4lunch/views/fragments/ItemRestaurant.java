@@ -2,11 +2,16 @@ package com.example.go4lunch.views.fragments;
 
 import android.content.Intent;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -19,6 +24,9 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.adapters.PlacesAdapter;
 import com.example.go4lunch.models.NearbySearch.NearbySearch;
 import com.example.go4lunch.models.NearbySearch.Result;
+import com.example.go4lunch.models.PlaceAutocomplete.PlaceAutocomplete;
+import com.example.go4lunch.models.PlaceAutocomplete.Prediction;
+import com.example.go4lunch.models.PlaceDetail.PlaceDetail;
 import com.example.go4lunch.presenters.Go4LunchStreams;
 import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.views.activities.RestaurantDetailActivity;
@@ -55,10 +63,10 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
     public String type;
 
 
-    public Double mLatitude = 48.85661;
+    public Double mLatitude;
 
 
-    public Double mLongitude = 2.35222;
+    public Double mLongitude;
 
     @BindInt(R.integer.radius)
     public int radius;
@@ -75,8 +83,14 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
     private Disposable mDisposable;
 
     private Location lastKnownLocation;
-    private boolean locationPermissionGranted;
+    private boolean locationPermissionGranted = true;
     private FusedLocationProviderClient mFusedLocationProviderClient;
+
+    int SEARCH_QUERY_THRESHOLD = 3;
+
+    private List<Prediction> PredictionList;
+
+    private LocationManager locationManager;
 
 
     /**
@@ -85,6 +99,8 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
      */
     public ItemRestaurant() {
     }
+
+
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
@@ -98,6 +114,9 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
+
 
     }
 
@@ -106,17 +125,44 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_item_list_restaurant, container, false);
         ButterKnife.bind(this,view);
+        setHasOptionsMenu(true);
+        getDeviceLocation();
         this.configureRecyclerView();
         this.configureOnClickRecyclerView();
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
-        getDeviceLocation();
-        executeHttpRequestWithRetrofitDetail();
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+        inflater.inflate(R.menu.search_view,menu);
+        MenuItem menuItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if (query.length() >= SEARCH_QUERY_THRESHOLD){
+                    executeAutocompleteRequestWithRetrofit(query);
+
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (newText.length() >= SEARCH_QUERY_THRESHOLD){
+                    executeAutocompleteRequestWithRetrofit(newText);
+                }
+                return true;
+            }
+        });
     }
 
     public void configureRecyclerView(){
         mRestaurants = new ArrayList<>();
         mAdapter = new PlacesAdapter(this.mRestaurants, Glide.with(this),mLatitude,mLongitude);
+        mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity().getApplicationContext(),DividerItemDecoration.VERTICAL));
@@ -135,19 +181,63 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
                 });
     }
 
-    private void executeHttpRequestWithRetrofitDetail(){
+    private void executeHttpRequestWithRetrofitDetail(String mLocation){
         mDisposable = Go4LunchStreams.streamFetchRestaurants(mLocation,radius,type).subscribeWith(new DisposableObserver<NearbySearch>() {
 
             @Override
             public void onNext(@NonNull NearbySearch nearbySearch) {
                 Log.e("Tag","detailResultListInHttpRequest" + nearbySearch.getResults().size());
                 updateUiWithPlaceDetail(nearbySearch.getResults());
-
             }
 
             @Override
             public void onError(@NonNull Throwable e) {
                 Log.e("Tag","Error"+e);
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+    }
+
+    private void executeAutocompleteRequestWithRetrofit(String query){
+        mDisposable = Go4LunchStreams.streamFetchAutocomplete(query,mLocation,radius).subscribeWith(new DisposableObserver<PlaceAutocomplete>() {
+            @Override
+            public void onNext(@NonNull PlaceAutocomplete placeAutocomplete) {
+                PredictionList = placeAutocomplete.getPredictions();
+                String placeId = PredictionList.get(0).getPlaceId();
+                Log.e("Tag","restaurantPLaceDetail" + PredictionList.get(0).getDescription());
+                executePlaceDetailRequestWithRetrofit(placeId);
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+    }
+
+    private void executePlaceDetailRequestWithRetrofit(String placeId){
+        mDisposable = Go4LunchStreams.streamFetchDetails(placeId).subscribeWith(new DisposableObserver<PlaceDetail>() {
+            @Override
+            public void onNext(@NonNull PlaceDetail placeDetail) {
+                Double latitude = placeDetail.getResult().getGeometry().getLocation().getLat();
+                Double longitude = placeDetail.getResult().getGeometry().getLocation().getLng();
+                String searchLocation = latitude + "," + longitude;
+                executeHttpRequestWithRetrofitDetail(searchLocation);
+
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
 
             }
 
@@ -165,6 +255,7 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
 
     }
     private void getDeviceLocation() {
+        Log.e("tag","location getdevicelocation");
         /*
          * Get the best and most recent location of the device, which may be null in rare
          * cases when a location is not available.
@@ -179,8 +270,13 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
                             // Set the map's camera position to the current location of the device.
                             lastKnownLocation = task.getResult();
                             mLocation = lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude();
+                            mLatitude = lastKnownLocation.getLatitude();
+                            mLongitude = lastKnownLocation.getLongitude();
+                            mAdapter.setUserLatitude(mLatitude);
+                            mAdapter.setUserLongitude(mLongitude);
+                            executeHttpRequestWithRetrofitDetail(mLocation);
                             Log.e("TAG", "Location/devicelocation" + mLocation);
-                            executeHttpRequestWithRetrofitDetail();
+
                             if (lastKnownLocation != null) {
 
                                 Log.e("TAG", "Location/devicelocation" + mLocation);

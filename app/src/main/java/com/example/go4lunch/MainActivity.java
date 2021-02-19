@@ -21,7 +21,6 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.go4lunch.api.UserHelper;
 import com.example.go4lunch.views.activities.Authentification;
 import com.example.go4lunch.views.activities.RestaurantDetailActivity;
 import com.example.go4lunch.views.activities.SettingsActivity;
@@ -157,7 +156,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             String username = this.getCurrentUser().getDisplayName();
             String uid = this.getCurrentUser().getUid();
 
-            UserHelper.createUser(uid, username, urlPicture).addOnFailureListener(this.onFailureListener());;
+            //UserHelper.createUser(uid, username, urlPicture).addOnFailureListener(this.onFailureListener());;
         }
     }
 

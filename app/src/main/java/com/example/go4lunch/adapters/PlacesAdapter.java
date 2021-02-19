@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
-import com.example.go4lunch.BuildConfig;
 import com.example.go4lunch.R;
 import com.example.go4lunch.models.NearbySearch.Result;
 
@@ -37,6 +36,14 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
         this.userLongitude = userLongitude;
     }
 
+    public void setUserLatitude(Double userLatitude){
+        this.userLatitude = userLatitude;
+    }
+
+    public void setUserLongitude(Double userLongitude) {
+        this.userLongitude = userLongitude;
+    }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
@@ -49,8 +56,12 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
     }
 
     public float divideRating(Double rating){
-        return (float) ((rating / 5) * 3);
+        if (rating == null){
+            return 0;
+        }
+        else return (float) ((rating / 5) * 3);
     }
+
 
     public String getDistanceBetweenUserLocationAndPlace(int adapterPosition){
         userLocation.setLatitude(userLatitude);
@@ -69,7 +80,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
         holder.mRating.setRating(divideRating(mPlaces.get(position).getRating()));
         holder.mRestaurantDistance.setText(String.format("%sm", getDistanceBetweenUserLocationAndPlace(position)));
         //holder.mRestaurantOpenHour.setText(mPlaces.get(position).getOpeningHours().getOpenNow().toString());
-        glide.load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + mPlaces.get(position).getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.API_KEY).into(holder.mRestaurantPicture);
+        //glide.load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + mPlaces.get(position).getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.API_KEY).into(holder.mRestaurantPicture);
 
 
     }
