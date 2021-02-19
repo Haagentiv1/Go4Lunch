@@ -2,6 +2,8 @@ package com.example.go4lunch.models;
 
 import androidx.annotation.Nullable;
 
+import java.util.List;
+
 public class User {
 
     private String uid;
@@ -9,8 +11,9 @@ public class User {
     private String userEmail;
     @Nullable private String urlPicture;
     private Boolean isNotification;
+    private List<String> likes;
 
-    public User(){ }
+    public User(String uid, String username, String urlPicture, String restaurant, List<String> likes){ }
 
     public User(String uid, String username, String urlPicture){
         this.uid = uid;

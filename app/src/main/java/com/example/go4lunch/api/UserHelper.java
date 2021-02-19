@@ -7,6 +7,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
+import java.util.List;
+
 public class UserHelper {
 
     private static final String COLLECTION_NAME = "users";
@@ -21,15 +23,15 @@ public class UserHelper {
 
     // --- CREATE ---
 
-    public static Task<Void> createUser(String uid, String username, String urlPicture){
-        User userToCreate = new User(uid,username, urlPicture);
+    public static Task<Void> createUser(String uid, String username, String urlPicture, String restaurant, List<String> likes){
+        User userToCreate = new User(uid,username, urlPicture, restaurant, likes);
         return UserHelper.getUsersCollection().document(uid).set(userToCreate);
     }
 
     // --- GET ---
 
     public static Query getAllUsers() {
-        return null;
+        return UserHelper.getUsersCollection();
     }
 
     public static Task<DocumentSnapshot> getUser(String uid){

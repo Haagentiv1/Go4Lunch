@@ -3,25 +3,34 @@ package com.example.go4lunch.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.RequestManager;
 import com.example.go4lunch.R;
-import com.example.go4lunch.models.NearbySearch.Result;
+import com.example.go4lunch.models.User;
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
-import java.util.List;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  *
  * TODO: Replace the implementation with code for your data type.
  */
-public class WorkMatesAdapter extends RecyclerView.Adapter<WorkMatesAdapter.ViewHolder> {
+public class WorkMatesAdapter extends FirestoreRecyclerAdapter<User,WorkMatesAdapter.ViewHolder> {
 
-    private final List<Result> mValues;
+    private final RequestManager glide;
 
-    public WorkMatesAdapter(List<Result> items) {
-        mValues = items;
+
+    public WorkMatesAdapter(@NonNull FirestoreRecyclerOptions<User> options, RequestManager glide) {
+        super(options);
+        this.glide = glide;
+
     }
 
     @Override
@@ -31,32 +40,24 @@ public class WorkMatesAdapter extends RecyclerView.Adapter<WorkMatesAdapter.View
         return new ViewHolder(view);
     }
 
+
+
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull User model) {
 
     }
 
-    @Override
-    public int getItemCount() {
-        return mValues.size();
-    }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-
+        @BindView(R.id.item_workmates_picture)
+        ImageView workmatesPicture;
+        @BindView(R.id.item_workmates)
+        TextView workmateRestaurantChoice;
 
         public ViewHolder(View view) {
             super(view);
-            mView = view;
-            mIdView = (TextView) view.findViewById(R.id.item_number);
-            mContentView = (TextView) view.findViewById(R.id.content);
+            ButterKnife.bind(this,view);
         }
 
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
-        }
     }
 }
