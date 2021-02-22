@@ -21,7 +21,8 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.go4lunch.views.activities.Authentification;
+import com.example.go4lunch.api.UserHelper;
+import com.example.go4lunch.views.activities.Authentication;
 import com.example.go4lunch.views.activities.RestaurantDetailActivity;
 import com.example.go4lunch.views.activities.SettingsActivity;
 import com.firebase.ui.auth.AuthUI;
@@ -29,7 +30,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.Timestamp;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import butterknife.ButterKnife;
@@ -105,14 +110,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     }
 
-    public void testConfiguration() {
-
-    }
-
-
-
-
-
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
@@ -155,8 +152,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                     this.getCurrentUser().getPhotoUrl().toString() : null;
             String username = this.getCurrentUser().getDisplayName();
             String uid = this.getCurrentUser().getUid();
+            List<String> likes = new ArrayList<>();
+            Date date = new Date();
+            Timestamp userCreationTimestamp = new Timestamp(date);
+            String chosenRestaurant = null;
+            Timestamp chosenRestaurantTimestamp = null;
 
-            //UserHelper.createUser(uid, username, urlPicture).addOnFailureListener(this.onFailureListener());;
+
+            UserHelper.createUser(uid, username, urlPicture,likes,userCreationTimestamp,chosenRestaurant,chosenRestaurantTimestamp).addOnFailureListener(this.onFailureListener());
         }
     }
 
@@ -188,7 +191,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
             case R.id.nav_logout:
                 signOutUserFromFirebase();
-                Intent intent2 = new Intent(this, Authentification.class);
+                Intent intent2 = new Intent(this, Authentication.class);
                 startActivity(intent2);
                 break;
             default:

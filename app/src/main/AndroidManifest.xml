@@ -42,7 +42,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".views.activities.Authentification"
+            android:name=".views.activities.Authentication"
             android:label="@string/app_name"
             android:theme="@style/Theme.Go4Lunch.NoActionBar">
             <intent-filter>
