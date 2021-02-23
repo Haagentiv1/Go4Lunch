@@ -250,6 +250,9 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
             }
         });
     }
+    private void configureUiStarWithUserLikes(String placeId){
+
+    }
 
     private void updateUiWithPlaceDetail(List<Result> placeDetails){
         mRestaurants.clear();

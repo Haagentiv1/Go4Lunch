@@ -44,6 +44,8 @@ public class WorkMatesAdapter extends FirestoreRecyclerAdapter<User,WorkMatesAda
 
     @Override
     protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull User model) {
+        holder.workmateRestaurantChoice.setText(model.getUsername());
+        glide.load(model.getUrlPicture()).circleCrop().into(holder.workmatesPicture);
 
     }
 
@@ -51,7 +53,7 @@ public class WorkMatesAdapter extends FirestoreRecyclerAdapter<User,WorkMatesAda
     public class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.item_workmates_picture)
         ImageView workmatesPicture;
-        @BindView(R.id.item_workmates)
+        @BindView(R.id.item_workmates_restaurant)
         TextView workmateRestaurantChoice;
 
         public ViewHolder(View view) {

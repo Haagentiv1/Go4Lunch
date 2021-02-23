@@ -1,3 +1,4 @@
+
 package com.example.go4lunch.api;
 
 import com.example.go4lunch.models.User;
@@ -34,6 +35,8 @@ public class UserHelper {
     public static Query getAllUsers() {
         return UserHelper.getUsersCollection();
     }
+
+   
 
     public static Task<DocumentSnapshot> getUser(String uid){
         return UserHelper.getUsersCollection().document(uid).get();
