@@ -7,14 +7,19 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.example.go4lunch.BuildConfig;
 import com.example.go4lunch.R;
+import com.example.go4lunch.api.UserHelper;
 import com.example.go4lunch.models.PlaceDetail.PlaceDetail;
 import com.example.go4lunch.models.PlaceDetail.PlaceDetailResult;
 import com.example.go4lunch.presenters.Go4LunchStreams;
+import com.google.firebase.auth.FirebaseAuth;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,9 +39,12 @@ public class RestaurantDetailActivity extends AppCompatActivity {
     public TextView restaurantName;
     @BindView(R.id.detail_restaurant_address)
     public TextView restaurantAddress;
+    @BindView(R.id.detail_like_image)
+    public ImageView likeImage;
 
     private String phone;
     private String website;
+    private List<String> userLikes;
 
 
     @OnClick(R.id.detail_restaurant_callButton)
@@ -48,8 +56,15 @@ public class RestaurantDetailActivity extends AppCompatActivity {
     @OnClick(R.id.detail_restaurant_websiteButton)
     public void websiteActivity(){
         startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(website)));
+    }
+
+    @OnClick(R.id.detail_restaurant_likeButton)
+    public void onClickLike(){
 
     }
+
+    @Nullable
+    protected String getCurrentUserUid(){ return FirebaseAuth.getInstance().getCurrentUser().getUid(); }
 
 
     @Override
@@ -58,8 +73,6 @@ public class RestaurantDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_restaurant_detail);
         ButterKnife.bind(this);
         recoverDetailRestaurant();
-
-
     }
 
     public void recoverDetailRestaurant(){
@@ -78,6 +91,7 @@ public class RestaurantDetailActivity extends AppCompatActivity {
         phone = placeDetailResult.getFormattedPhoneNumber();
         website = placeDetailResult.getWebsite();
         Log.e("website", "websiteurl" + website);
+        Log.e("Tag","restoid" + restaurantId);
 
     }
 
@@ -103,6 +117,25 @@ public class RestaurantDetailActivity extends AppCompatActivity {
 
             }
         });
-
     }
+
+    public void getUserFromFirebaseDatabase(){
+        UserHelper.getUser(getCurrentUserUid());
+    }
+
+    public boolean checkLikes(@Nullable List<String> userLikes){
+        for (String userLike : userLikes){
+            if (userLike.equals(restaurantId)){
+                return true;
+            }
+        }return false;
+    }
+    public void updateLikeUi(){
+        if (checkLikes(userLikes)){
+            likeImage.setColorFilter(getApplicationContext().getResources().getColor(R.color.yellow_gold));
+        }else {
+            likeImage.setColorFilter(getApplicationContext().getResources().getColor(R.color.white));
+        }
+    }
+
 }
