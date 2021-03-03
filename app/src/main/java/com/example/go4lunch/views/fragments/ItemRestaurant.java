@@ -24,7 +24,6 @@ import com.example.go4lunch.BuildConfig;
 import com.example.go4lunch.R;
 import com.example.go4lunch.adapters.PlacesAdapter;
 import com.example.go4lunch.models.NearbySearch.NearbySearch;
-import com.example.go4lunch.models.NearbySearch.Result;
 import com.example.go4lunch.models.PlaceAutocomplete.PlaceAutocomplete;
 import com.example.go4lunch.models.PlaceAutocomplete.Prediction;
 import com.example.go4lunch.models.PlaceDetail.PlaceDetail;
@@ -80,7 +79,7 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
 
     private PlacesAdapter mAdapter;
 
-    private List<Result> mRestaurants = new ArrayList<>();
+    private List<PlaceDetail> mRestaurants = new ArrayList<>();
 
     private String mLocation =   mLatitude + "," + mLongitude;
 
@@ -190,6 +189,7 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
             @Override
             public void onSuccess(@NonNull List<PlaceDetail> placeDetails) {
                 Log.e("Tag","hhttp detail n nearby" + placeDetails.size());
+                updateUiWithPlaceDetail(placeDetails);
             }
 
             @Override
@@ -206,7 +206,7 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
             @Override
             public void onNext(@NonNull NearbySearch nearbySearch) {
                 Log.e("Tag","detailResultListInHttpRequest" + nearbySearch.getResults().size());
-                updateUiWithPlaceDetail(nearbySearch.getResults());
+
             }
 
             @Override
@@ -270,7 +270,7 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
 
     }
 
-    private void updateUiWithPlaceDetail(List<Result> placeDetails){
+    private void updateUiWithPlaceDetail(List<PlaceDetail> placeDetails){
         mRestaurants.clear();
         mRestaurants.addAll(placeDetails);
         mAdapter.notifyDataSetChanged();
