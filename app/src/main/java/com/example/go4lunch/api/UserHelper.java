@@ -6,6 +6,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
@@ -42,10 +43,16 @@ public class UserHelper {
         return UserHelper.getUsersCollection().document(uid).get();
     }
 
+
+
     // --- UPDATE ---
 
     public static Task<Void> updateChosenRestaurant(String uid,String chosenRestaurant){
         return UserHelper.getUsersCollection().document(uid).update("chosen_restaurant",chosenRestaurant);
+    }
+
+    public static Task<Void> updateUserLikes(String uid,String restaurantId){
+        return UserHelper.getUsersCollection().document(uid).update("likes", FieldValue.arrayUnion(restaurantId));
     }
 
     public static Task<Void> updateChosenRestaurantTimestamp(String uid, String chosenRestaurantTimestamp){
@@ -65,4 +72,10 @@ public class UserHelper {
     public static Task<Void> deleteUser(String uid){
         return UserHelper.getUsersCollection().document(uid).delete();
     }
+
+    public static Task<Void> deleteLike(String uid, String restaurantId){
+       return UserHelper.getUsersCollection().document(uid).update("likes",FieldValue.arrayRemove(restaurantId));
+    }
+
+
 }
