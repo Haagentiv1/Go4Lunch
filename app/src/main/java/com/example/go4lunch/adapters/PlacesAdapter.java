@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.RequestManager;
 import com.example.go4lunch.BuildConfig;
 import com.example.go4lunch.R;
-import com.example.go4lunch.models.NearbySearch.Result;
+import com.example.go4lunch.models.PlaceDetail.PlaceDetail;
 
 import java.util.List;
 
@@ -24,15 +24,15 @@ import butterknife.ButterKnife;
 
 public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder> {
 
-    private List<Result> mPlaces;
+    private List<PlaceDetail> placeDetailList;
     private RequestManager glide;
     private Double userLatitude;
     private Double userLongitude;
     private Location userLocation = new Location("");
     private Location placeLocation = new Location("");
 
-    public PlacesAdapter(@NonNull List<Result> places, RequestManager glide,Double userLatitude, Double userLongitude) {
-        this.mPlaces = places;
+    public PlacesAdapter(@NonNull List<PlaceDetail> places, RequestManager glide,Double userLatitude, Double userLongitude) {
+        this.placeDetailList = places;
         this.glide = glide;
         this.userLatitude = userLatitude;
         this.userLongitude = userLongitude;
@@ -54,7 +54,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
     }
 
     public String getResult(int position){
-        return this.mPlaces.get(position).getPlaceId();
+        return this.placeDetailList.get(position).getResult().getPlaceId();
     }
 
     public float divideRating(Double rating){
@@ -68,8 +68,8 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
     public String getDistanceBetweenUserLocationAndPlace(int adapterPosition){
         userLocation.setLatitude(userLatitude);
         userLocation.setLongitude(userLongitude);
-        placeLocation.setLatitude(mPlaces.get(adapterPosition).getGeometry().getLocation().getLat());
-        placeLocation.setLongitude(mPlaces.get(adapterPosition).getGeometry().getLocation().getLng());
+        placeLocation.setLatitude(placeDetailList.get(adapterPosition).getResult().getGeometry().getLocation().getLat());
+        placeLocation.setLongitude(placeDetailList.get(adapterPosition).getResult().getGeometry().getLocation().getLng());
         float distanceInMeter = userLocation.distanceTo(placeLocation);
         return String.valueOf(Math.round(distanceInMeter));
     }
@@ -77,13 +77,13 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mName.setText(mPlaces.get(position).getName());
-        holder.mAddress.setText(mPlaces.get(position).getVicinity());
-        holder.mRating.setRating(divideRating(mPlaces.get(position).getRating()));
+        holder.mName.setText(placeDetailList.get(position).getResult().getName());
+        holder.mAddress.setText(placeDetailList.get(position).getResult().getAdrAddress());
+        holder.mRating.setRating(divideRating(placeDetailList.get(position).getResult().getRating()));
         holder.mRestaurantDistance.setText(String.format("%sm", getDistanceBetweenUserLocationAndPlace(position)));
         //holder.mRestaurantOpenHour.setText(mPlaces.get(position).getOpeningHours().getOpenNow().toString());
-        if (mPlaces.get(position).getPhotos() != null && !mPlaces.get(position).getPhotos().isEmpty()){
-            glide.load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + mPlaces.get(position).getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.API_KEY).into(holder.mRestaurantPicture);
+        if (placeDetailList.get(position).getResult().getPhotos() != null && !placeDetailList.get(position).getResult().getPhotos().isEmpty()){
+            glide.load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + placeDetailList.get(position).getResult().getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.API_KEY).into(holder.mRestaurantPicture);
              }else {holder.mRestaurantPicture.setImageResource(R.drawable.image_not_available);}
 
 
@@ -93,7 +93,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
 
     @Override
     public int getItemCount() {
-        return mPlaces.size();
+        return placeDetailList.size();
     }
 
 
