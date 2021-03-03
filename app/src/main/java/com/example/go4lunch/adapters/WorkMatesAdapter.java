@@ -30,7 +30,6 @@ public class WorkMatesAdapter extends FirestoreRecyclerAdapter<User,WorkMatesAda
     public WorkMatesAdapter(@NonNull FirestoreRecyclerOptions<User> options, RequestManager glide) {
         super(options);
         this.glide = glide;
-
     }
 
     @Override
@@ -42,11 +41,12 @@ public class WorkMatesAdapter extends FirestoreRecyclerAdapter<User,WorkMatesAda
 
 
 
+
+
     @Override
     protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull User model) {
-        holder.workmateRestaurantChoice.setText(model.getUsername());
+        holder.workmateRestaurantChoice.setText(R.string.no_restaurant_chosen);
         glide.load(model.getUrlPicture()).circleCrop().into(holder.workmatesPicture);
-
     }
 
 
