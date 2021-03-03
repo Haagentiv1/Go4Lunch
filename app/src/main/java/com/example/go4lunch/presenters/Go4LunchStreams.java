@@ -56,7 +56,7 @@ public class Go4LunchStreams {
             public Observable<PlaceDetail> apply(Result result) throws Throwable {
                 return streamFetchDetails(result.getPlaceId());
             }
-        }).toList().subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread());
+        }).toList().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
 }
 
