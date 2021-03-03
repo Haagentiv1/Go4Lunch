@@ -49,6 +49,7 @@ import butterknife.ButterKnife;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
+import io.reactivex.rxjava3.observers.DisposableSingleObserver;
 
 import static android.content.ContentValues.TAG;
 
@@ -184,6 +185,21 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
                 });
     }
 
+    private void executeHttpRequestWithRestrofitNearbyDetailRestaurant(String mLocation){
+        mDisposable = Go4LunchStreams.streamFetchRestaurantsDetails(mLocation,radius,type).subscribeWith(new DisposableSingleObserver<List<PlaceDetail>>() {
+            @Override
+            public void onSuccess(@NonNull List<PlaceDetail> placeDetails) {
+                Log.e("Tag","hhttp detail n nearby" + placeDetails.size());
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                Log.e("Tag","error nearbydetail" + e);
+
+            }
+        });
+    }
+
     private void executeHttpRequestWithRetrofitDetail(String mLocation){
         mDisposable = Go4LunchStreams.streamFetchRestaurants(mLocation,radius,type).subscribeWith(new DisposableObserver<NearbySearch>() {
 
@@ -281,6 +297,7 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
                             mAdapter.setUserLatitude(mLatitude);
                             mAdapter.setUserLongitude(mLongitude);
                             executeHttpRequestWithRetrofitDetail(mLocation);
+                            executeHttpRequestWithRestrofitNearbyDetailRestaurant(mLocation);
                             Log.e("TAG", "Location/devicelocation" + mLocation);
 
                             if (lastKnownLocation != null) {
