@@ -51,6 +51,7 @@ import java.util.List;
 import butterknife.BindInt;
 import butterknife.BindString;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 
@@ -76,6 +77,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
     private Location lastKnownLocation;
+
 
     @BindString(R.string.type)
     public String type;
@@ -114,6 +116,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         mMapFragment.getMapAsync(this);
 
     }
+    @OnClick(R.id.FloatingLocationButton)
+    public void displayLocation(){
+        getDeviceLocation();
+    }
+
+
 
     @Override
     public void onStart() {
@@ -202,8 +210,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         try {
             if (locationPermissionGranted) {
                 map.setMyLocationEnabled(true);
-                map.getUiSettings().setMyLocationButtonEnabled(true);
+                map.getUiSettings().setMyLocationButtonEnabled(false);
                 map.setMapStyle(MapStyleOptions.loadRawResourceStyle(getActivity().getApplicationContext(),R.raw.style_json));
+                map.getUiSettings().setMapToolbarEnabled(false);
             } else {
                 map.setMyLocationEnabled(false);
                 map.getUiSettings().setMyLocationButtonEnabled(false);
@@ -254,6 +263,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
 
     private void displayNearbyRestaurantMarker(List<Result> results){
         if (map != null) {
+            map.clear();
             for (Result result : results) {
                  MarkerOptions options = new MarkerOptions().position(new LatLng(result.getGeometry().getLocation().getLat(), result.getGeometry().getLocation().getLng()))
                         .title(result.getName())
