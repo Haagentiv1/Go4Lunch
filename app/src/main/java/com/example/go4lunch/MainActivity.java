@@ -1,15 +1,19 @@
 package com.example.go4lunch;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -22,6 +26,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.api.UserHelper;
+import com.example.go4lunch.models.User;
 import com.example.go4lunch.views.activities.Authentication;
 import com.example.go4lunch.views.activities.RestaurantDetailActivity;
 import com.example.go4lunch.views.activities.SettingsActivity;
@@ -31,7 +36,10 @@ import com.google.android.libraries.places.api.Places;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -45,6 +53,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private DrawerLayout mDrawerLayout;
     private Toolbar mToolbar;
     private BottomNavigationView mBottomNavigationView;
+    private User currentUser;
 
 
     // 2 - Identify each Http Request
@@ -59,11 +68,25 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         this.handleResponseAfterSignIn(requestCode,resultCode,data);
     }
 
+    @Nullable
+    protected String getCurrentUserUid(){ return FirebaseAuth.getInstance().getCurrentUser().getUid(); }
+
+    private void getUserInfoFromFirebase(){
+    UserHelper.getUser(getCurrentUserUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        @Override
+        public void onSuccess(DocumentSnapshot documentSnapshot) {
+           currentUser = documentSnapshot.toObject(User.class);
+        }
+    });
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
         setContentView(R.layout.activity_main);
+        Log.e("Tag", String.valueOf(LocalDateTime.now()));
 
         Places.initialize(getApplicationContext(), String.valueOf(R.string.google_api_key));
         configureToolbar();
@@ -71,6 +94,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         configureDrawerLayout();
         configureNavHeader();
         configureBottomNavigation();
+        getUserInfoFromFirebase();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
 
     }
@@ -159,7 +183,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             Timestamp chosenRestaurantTimestamp = null;
 
 
-            UserHelper.createUser(uid, username, urlPicture,likes,userCreationTimestamp,chosenRestaurant,chosenRestaurantTimestamp).addOnFailureListener(this.onFailureListener());
+            UserHelper.createUser(uid, username, urlPicture,likes,userCreationTimestamp, null, null).addOnFailureListener(this.onFailureListener());
         }
     }
 
@@ -175,12 +199,20 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         AuthUI.getInstance().signOut(this).addOnSuccessListener(this, this.updateUIAfterRESTRequestsCompleted(SIGN_OUT_TASK));
     }
 
+    private Boolean checkUserRestaurant(){
+        if (currentUser.getChosenRestaurant() != null){
+            return true;
+        }else return false;
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_your_lunch:
+                if (checkUserRestaurant()){
                 Intent intent = new Intent(this, RestaurantDetailActivity.class);
                 startActivity(intent);
+                    }else Toast.makeText(this,"Vous n'avez pas encore choisit de restaurant",Toast.LENGTH_LONG).show();
                 break;
 
 
