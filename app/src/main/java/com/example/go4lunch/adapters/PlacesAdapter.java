@@ -30,6 +30,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
     private Double userLongitude;
     private Location userLocation = new Location("");
     private Location placeLocation = new Location("");
+
     public PlacesAdapter(@NonNull List<Result> places, RequestManager glide,Double userLatitude, Double userLongitude) {
         this.mPlaces = places;
         this.glide = glide;
