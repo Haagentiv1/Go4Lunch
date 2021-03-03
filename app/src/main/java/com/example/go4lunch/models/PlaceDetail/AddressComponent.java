@@ -19,7 +19,7 @@ public class AddressComponent implements Serializable
     @SerializedName("types")
     @Expose
     private List<String> types = null;
-    private final static long serialVersionUID = 6765538270218164017L;
+    private final static long serialVersionUID = -6662182820857622213L;
 
     public String getLongName() {
         return longName;

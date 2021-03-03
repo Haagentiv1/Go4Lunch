@@ -15,11 +15,11 @@ public class PlaceDetail implements Serializable
     private List<Object> htmlAttributions = null;
     @SerializedName("result")
     @Expose
-    private PlaceDetailResult result;
+    private Result result;
     @SerializedName("status")
     @Expose
     private String status;
-    private final static long serialVersionUID = -2513869471756533863L;
+    private final static long serialVersionUID = 708704582596450986L;
 
     public List<Object> getHtmlAttributions() {
         return htmlAttributions;
@@ -29,11 +29,11 @@ public class PlaceDetail implements Serializable
         this.htmlAttributions = htmlAttributions;
     }
 
-    public PlaceDetailResult getResult() {
+    public Result getResult() {
         return result;
     }
 
-    public void setResult(PlaceDetailResult result) {
+    public void setResult(Result result) {
         this.result = result;
     }
 

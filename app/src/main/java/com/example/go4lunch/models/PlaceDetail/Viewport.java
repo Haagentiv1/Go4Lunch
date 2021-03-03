@@ -1,10 +1,9 @@
 
 package com.example.go4lunch.models.PlaceDetail;
 
+import java.io.Serializable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-
-import java.io.Serializable;
 
 public class Viewport implements Serializable
 {
@@ -15,7 +14,7 @@ public class Viewport implements Serializable
     @SerializedName("southwest")
     @Expose
     private Southwest southwest;
-    private final static long serialVersionUID = 7729837603116003442L;
+    private final static long serialVersionUID = 6302148247251188561L;
 
     public Northeast getNortheast() {
         return northeast;

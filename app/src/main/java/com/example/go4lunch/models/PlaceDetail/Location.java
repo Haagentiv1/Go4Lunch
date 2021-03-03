@@ -1,10 +1,9 @@
 
 package com.example.go4lunch.models.PlaceDetail;
 
+import java.io.Serializable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-
-import java.io.Serializable;
 
 public class Location implements Serializable
 {
@@ -15,7 +14,7 @@ public class Location implements Serializable
     @SerializedName("lng")
     @Expose
     private Double lng;
-    private final static long serialVersionUID = -5299537703656356528L;
+    private final static long serialVersionUID = 2218282119462575728L;
 
     public Double getLat() {
         return lat;

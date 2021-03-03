@@ -1,10 +1,9 @@
 
 package com.example.go4lunch.models.PlaceDetail;
 
+import java.io.Serializable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-
-import java.io.Serializable;
 
 public class Review implements Serializable
 {
@@ -33,7 +32,7 @@ public class Review implements Serializable
     @SerializedName("time")
     @Expose
     private Integer time;
-    private final static long serialVersionUID = 6043259597504883158L;
+    private final static long serialVersionUID = 8398743216172395345L;
 
     public String getAuthorName() {
         return authorName;
