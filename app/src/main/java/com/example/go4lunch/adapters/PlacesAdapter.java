@@ -78,7 +78,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mName.setText(placeDetailList.get(position).getResult().getName());
-        holder.mAddress.setText(placeDetailList.get(position).getResult().getAdrAddress());
+        holder.mAddress.setText(placeDetailList.get(position).getResult().getFormattedAddress());
         holder.mRating.setRating(divideRating(placeDetailList.get(position).getResult().getRating()));
         holder.mRestaurantDistance.setText(String.format("%sm", getDistanceBetweenUserLocationAndPlace(position)));
         //holder.mRestaurantOpenHour.setText(mPlaces.get(position).getOpeningHours().getOpenNow().toString());
