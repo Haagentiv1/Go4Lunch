@@ -13,9 +13,10 @@
 
     <TextView
         android:id="@+id/item_workmates_restaurant"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin"
+        android:singleLine="true"
         android:textStyle="bold"
         android:text="Tristan is eating french (Le zinc)"
         android:layout_toEndOf="@id/item_workmates_picture"
