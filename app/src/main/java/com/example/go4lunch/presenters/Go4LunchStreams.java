@@ -1,7 +1,7 @@
 package com.example.go4lunch.presenters;
 
-import com.example.go4lunch.apiService.ApiService;
-import com.example.go4lunch.apiService.RetrofitService;
+import com.example.go4lunch.WebService.ApiService;
+import com.example.go4lunch.WebService.RetrofitService;
 import com.example.go4lunch.models.NearbySearch.NearbySearch;
 import com.example.go4lunch.models.NearbySearch.Result;
 import com.example.go4lunch.models.PlaceAutocomplete.PlaceAutocomplete;
