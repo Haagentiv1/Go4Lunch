@@ -1,4 +1,4 @@
-package com.example.go4lunch.apiService;
+package com.example.go4lunch.WebService;
 
 import com.example.go4lunch.BuildConfig;
 import com.example.go4lunch.models.NearbySearch.NearbySearch;
