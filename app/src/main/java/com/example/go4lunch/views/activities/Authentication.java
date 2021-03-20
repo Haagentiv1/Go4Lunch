@@ -3,25 +3,34 @@ package com.example.go4lunch.views.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.multidex.MultiDex;
 
+import com.example.go4lunch.BaseActivity;
 import com.example.go4lunch.MainActivity;
 import com.example.go4lunch.R;
+import com.example.go4lunch.api.UserHelper;
+import com.example.go4lunch.models.User;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
-public class Authentication extends AppCompatActivity {
+public class Authentication extends  BaseActivity {
 
     private FirebaseAuth mAuth;
     private static final int RC_SIGN_IN = 123;
+    private List<User> userList = new ArrayList<>();
 
     public void createSignInIntent() {
         List<AuthUI.IdpConfig> providers = Arrays.asList(
@@ -47,10 +56,13 @@ public class Authentication extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
+            Log.e("Tag","SignIn");
 
             if (resultCode == RESULT_OK) {
+                Log.e("Tag","ResultOK");
                 // Successfully signed in
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                createUserInFirestore();
                 Intent intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
                 // ...
@@ -60,6 +72,24 @@ public class Authentication extends AppCompatActivity {
                 // response.getError().getErrorCode() and handle the error.
                 // ...
             }
+        }
+    }
+
+    private void createUserInFirestore(){
+        if (!checkUserInFirestore()){
+            String urlPicture = (this.getCurrentUser().getPhotoUrl() != null) ?
+                    this.getCurrentUser().getPhotoUrl().toString() : null;
+            String username = this.getCurrentUser().getDisplayName();
+            String uid = this.getCurrentUser().getUid();
+            List<String> likes = new ArrayList<>();
+            Date date = new Date();
+            Timestamp userCreationTimestamp = new Timestamp(date);
+            String chosenRestaurant = null;
+            Timestamp chosenRestaurantTimestamp = null;
+            String chosenRestaurantName = null;
+
+
+            UserHelper.createUser(uid, username, urlPicture,likes,userCreationTimestamp, null,null ,null).addOnFailureListener(this.onFailureListener());
         }
     }
 
@@ -77,6 +107,24 @@ public class Authentication extends AppCompatActivity {
         MultiDex.install(this);
     }
 
+    public Boolean checkUserInFirestore(){
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        for (User user : userList){
+            if (user.getUid().equals(currentUser.getUid())) return true;
+        }
+        return false;
+    }
+
+    public void getUsersFromFirestore(){
+        UserHelper.getUsers().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                  userList = queryDocumentSnapshots.toObjects(User.class);
+            }
+        });
+
+    }
+
 
 
     @Override
@@ -84,6 +132,7 @@ public class Authentication extends AppCompatActivity {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
+        getUsersFromFirestore();
         //updateUI(currentUser);
     }
 }
