@@ -9,6 +9,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.List;
 
@@ -26,8 +27,8 @@ public class UserHelper {
 
     // --- CREATE ---
 
-    public static Task<Void> createUser(String uid, String username, String urlPicture, List<String> likes, Timestamp userCreationTimestamp, String chosenRestaurant , Timestamp chosenRestaurantTimeStamp){
-        User userToCreate = new User(uid,username, urlPicture, likes, userCreationTimestamp, chosenRestaurant,chosenRestaurantTimeStamp);
+    public static Task<Void> createUser(String uid, String username, String urlPicture, List<String> likes, Timestamp userCreationTimestamp, String chosenRestaurant , String chosenRestaurantName, Timestamp chosenRestaurantTimeStamp){
+        User userToCreate = new User(uid,username, urlPicture, likes, userCreationTimestamp, chosenRestaurant,chosenRestaurantName,chosenRestaurantTimeStamp);
         return UserHelper.getUsersCollection().document(uid).set(userToCreate);
     }
 
@@ -36,6 +37,16 @@ public class UserHelper {
     public static Query getAllUsers() {
         return UserHelper.getUsersCollection();
     }
+
+    public static Query getAllUsersByRestaurant(String restaurantID){
+        return UserHelper.getUsersCollection().whereEqualTo("chosenRestaurant",restaurantID);
+    }
+
+    public static Task<QuerySnapshot> getUsers(){
+        return UserHelper.getUsersCollection().get();
+    }
+
+
 
    
 
@@ -48,15 +59,19 @@ public class UserHelper {
     // --- UPDATE ---
 
     public static Task<Void> updateChosenRestaurant(String uid,String chosenRestaurant){
-        return UserHelper.getUsersCollection().document(uid).update("chosen_restaurant",chosenRestaurant);
+        return UserHelper.getUsersCollection().document(uid).update("chosenRestaurant",chosenRestaurant);
+    }
+
+    public static Task<Void> updateChosenRestaurantName(String uid, String restaurantName){
+        return UserHelper.getUsersCollection().document(uid).update("chosenRestaurantName", restaurantName);
     }
 
     public static Task<Void> updateUserLikes(String uid,String restaurantId){
         return UserHelper.getUsersCollection().document(uid).update("likes", FieldValue.arrayUnion(restaurantId));
     }
 
-    public static Task<Void> updateChosenRestaurantTimestamp(String uid, String chosenRestaurantTimestamp){
-        return UserHelper.getUsersCollection().document(uid).update("chosen_restaurant_timestamp", chosenRestaurantTimestamp);
+    public static Task<Void> updateChosenRestaurantTimestamp(String uid, Timestamp chosenRestaurantTimestamp){
+        return UserHelper.getUsersCollection().document(uid).update("chosenRestaurantTimestamp", chosenRestaurantTimestamp);
     }
 
     public static Task<Void> updateUsername(String username, String uid){
