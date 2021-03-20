@@ -1,5 +1,6 @@
 package com.example.go4lunch.adapters;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import com.example.go4lunch.models.User;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
+import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -25,6 +27,8 @@ import butterknife.ButterKnife;
 public class WorkMatesAdapter extends FirestoreRecyclerAdapter<User,WorkMatesAdapter.ViewHolder> {
 
     private final RequestManager glide;
+    @BindString(R.string.restaurant_chosen)
+    public String restaurantChosen;
 
 
     public WorkMatesAdapter(@NonNull FirestoreRecyclerOptions<User> options, RequestManager glide) {
@@ -39,13 +43,11 @@ public class WorkMatesAdapter extends FirestoreRecyclerAdapter<User,WorkMatesAda
         return new ViewHolder(view);
     }
 
-
-
-
-
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull User model) {
-        holder.workmateRestaurantChoice.setText(R.string.no_restaurant_chosen);
+        String string = holder.workmateRestaurantChoice.getContext().getString(R.string.restaurant_chosen);
+        holder.workmateRestaurantChoice.setText(model.getUsername() + string + model.getChosenRestaurantName());
         glide.load(model.getUrlPicture()).circleCrop().into(holder.workmatesPicture);
     }
 
