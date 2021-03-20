@@ -10,20 +10,30 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.go4lunch.BuildConfig;
 import com.example.go4lunch.R;
+import com.example.go4lunch.adapters.WorkMatesAdapter;
 import com.example.go4lunch.api.UserHelper;
 import com.example.go4lunch.models.PlaceDetail.PlaceDetail;
 import com.example.go4lunch.models.PlaceDetail.Result;
 import com.example.go4lunch.models.User;
 import com.example.go4lunch.presenters.Go4LunchStreams;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -46,12 +56,18 @@ public class RestaurantDetailActivity extends AppCompatActivity {
     public TextView restaurantAddress;
     @BindView(R.id.detail_like_image)
     public ImageView likeImageView;
+    @BindView(R.id.workmates_recycler)
+    public RecyclerView recyclerView;
 
 
     private String phone;
     private String website;
     private List<String> userLikes = new ArrayList<>();
     private User currentUser;
+    private WorkMatesAdapter workMatesAdapter;
+    private List<User> userList = new ArrayList<>();
+    private List<User> usersListRestaurant = new ArrayList<>();
+    private PlaceDetail currentPlaceDetail;
 
 
     @OnClick(R.id.detail_restaurant_callButton)
@@ -72,19 +88,39 @@ public class RestaurantDetailActivity extends AppCompatActivity {
     @OnClick(R.id.detail_restaurant_likeButton)
     public void onClickLike(){
         if (userLikes.contains(restaurantId)){
+            userLikes.remove(restaurantId);
             UserHelper.deleteLike(getCurrentUserUid(),restaurantId);
+            likeImageView.setImageResource(R.drawable.ic_baseline_star_rate_24);
     }else{
           UserHelper.updateUserLikes(getCurrentUserUid(),restaurantId);
+          likeImageView.setImageResource(R.drawable.ic_liked_star);
+          userLikes.add(restaurantId);
         }
     }
     @OnClick(R.id.Reserv_Restaurant_btn)
     public void onCLickOnReserveRestaurantButton(){
         UserHelper.updateChosenRestaurant(getCurrentUserUid(),restaurantId);
+        Date date = new Date();
+        Timestamp restaurantReservationCreationTimestamp= new Timestamp(date);
+        UserHelper.updateChosenRestaurantTimestamp(getCurrentUserUid(),restaurantReservationCreationTimestamp);
+        UserHelper.updateChosenRestaurantName(getCurrentUserUid(),currentPlaceDetail.getResult().getName());
     }
 
 
     @Nullable
     protected String getCurrentUserUid(){ return FirebaseAuth.getInstance().getCurrentUser().getUid(); }
+
+    public void getUsersWithThisRestaurant(){
+        Log.e("Tag","test");
+        UserHelper.getAllUsersByRestaurant(restaurantId).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                Log.e("Tag","wrkm" + String.valueOf(queryDocumentSnapshots.getDocuments().size()));
+                List<User> userList1 =queryDocumentSnapshots.toObjects(User.class);
+            }
+        });
+
+    }
 
 
     @Override
@@ -92,17 +128,46 @@ public class RestaurantDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant_detail);
         ButterKnife.bind(this);
+        getUserFromFirebaseDatabase();
         recoverDetailRestaurant();
+        getUsersWithThisRestaurant();
+        configureRecyclerView();
+
+    }
+
+
+    @NotNull
+    private FirestoreRecyclerOptions<User> generateOptionsForAdapter(Query query){
+        return new FirestoreRecyclerOptions.Builder<User>()
+                .setQuery(query, User.class)
+                .setLifecycleOwner(this)
+                .build();
+    }
+
+
+
+    private void configureRecyclerView(){
+        this.workMatesAdapter = new WorkMatesAdapter(generateOptionsForAdapter(UserHelper.getAllUsersByRestaurant(restaurantId)), Glide.with(this));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        recyclerView.setAdapter(workMatesAdapter);
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getUsersList();
     }
 
     public void recoverDetailRestaurant(){
         Intent intent = getIntent();
         if (intent != null){
             restaurantId = intent.getStringExtra("placeID");
-            Log.e("restaurant id", "id" + restaurantId);
             executeHttpRequestForRetrievePlaceDetailData();
         }
     }
+
+
 
     private void setRestaurantPicture(Result placeDetailResult){
         if (placeDetailResult.getPhotos() != null && !placeDetailResult.getPhotos().isEmpty()){
@@ -116,24 +181,17 @@ public class RestaurantDetailActivity extends AppCompatActivity {
         restaurantAddress.setText(placeDetailResult.getFormattedAddress());
         phone = placeDetailResult.getFormattedPhoneNumber();
         website = placeDetailResult.getUrl();
-        likeImageView.setBackgroundResource(R.drawable.ic_baseline_star_rate_24);
-        Log.e("website", "websiteurl" + website);
-        Log.e("Tag","restoid" + restaurantId);
-
+        updateDrawableLikes();
     }
 
     private void executeHttpRequestForRetrievePlaceDetailData(){
-        Log.e("httpid","id" + restaurantId);
         disposable = Go4LunchStreams.streamFetchDetails(restaurantId).subscribeWith(new DisposableObserver<PlaceDetail>() {
             @Override
             public void onNext(PlaceDetail placeDetail) {
-                Log.e("detailHttp","detailObject" + placeDetail.getStatus());
-                Log.e("test","test" + placeDetail.getResult().getPlaceId());
+                currentPlaceDetail = placeDetail;
                 Result placeDetailResult = placeDetail.getResult();
                 bindPlaceDetailDataToView(placeDetailResult);
                 setRestaurantPicture(placeDetailResult);
-                Log.e("Tag","getType" + placeDetail.getResult().getTypes());
-
             }
 
             @Override
@@ -154,21 +212,35 @@ public class RestaurantDetailActivity extends AppCompatActivity {
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 currentUser = documentSnapshot.toObject(User.class);
                 userLikes = currentUser.getLikes();
+                updateDrawableLikes();
             }
         });
     }
 
-    public void getUserLikes(){
-
-    }
-
-    public boolean checkLikes(@Nullable List<String> userLikes){
-        for (String userLike : userLikes){
-            if (userLike.equals(restaurantId)){
-                return true;
+    public void getUsersWithTheSameRestaurant(){
+        for (User user : userList){
+            if (user.getChosenRestaurant().equals(restaurantId)){
+                usersListRestaurant.add(user);
             }
-        }return false;
+        }
     }
+
+    public void getUsersList(){
+        UserHelper.getUsers().addOnSuccessListener(queryDocumentSnapshots ->
+                userList = queryDocumentSnapshots.toObjects(User.class));
+        getUsersWithTheSameRestaurant();
+    }
+
+
+
+    public void updateDrawableLikes(){
+        if (userLikes.contains(restaurantId)){
+            likeImageView.setImageResource(R.drawable.ic_liked_star);
+        }else likeImageView.setImageResource(R.drawable.ic_baseline_star_rate_24);
+    }
+
+
+
 
 
 }
