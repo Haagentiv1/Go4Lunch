@@ -17,6 +17,8 @@ import com.example.go4lunch.models.User;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.Query;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.annotation.Nullable;
 
 import butterknife.BindView;
@@ -48,6 +50,7 @@ public class WorkMatesListFragment extends Fragment {
 
 
     // TODO: Customize parameter initialization
+    @NotNull
     @SuppressWarnings("unused")
     public static WorkMatesListFragment newInstance(int columnCount) {
         WorkMatesListFragment fragment = new WorkMatesListFragment();
@@ -65,7 +68,7 @@ public class WorkMatesListFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_item_list_workmates, container, false);
         ButterKnife.bind(this,view);
@@ -73,6 +76,7 @@ public class WorkMatesListFragment extends Fragment {
         return view;
     }
 
+    @NotNull
     private FirestoreRecyclerOptions<User> generateOptionsForAdapter(Query query){
         return new FirestoreRecyclerOptions.Builder<User>()
                 .setQuery(query, User.class)
@@ -84,6 +88,5 @@ public class WorkMatesListFragment extends Fragment {
         this.workMatesAdapter = new WorkMatesAdapter(generateOptionsForAdapter(UserHelper.getAllUsers()), Glide.with(this));
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(workMatesAdapter);
-
     }
 }
