@@ -140,7 +140,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
             @Override
             public boolean onQueryTextSubmit(String query) {
                 if (query.length() >= SEARCH_QUERY_THRESHOLD){
-                     executeAutocompleteHttpRequestWithRetrofit(query);
+                    // executeAutocompleteHttpRequestWithRetrofit(query);
 
                 }
                 return false;
@@ -149,7 +149,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (newText.length() >= SEARCH_QUERY_THRESHOLD){
-                    executeAutocompleteHttpRequestWithRetrofit(newText);
+                    //executeAutocompleteHttpRequestWithRetrofit(newText);
 
                 }
                 return true;
@@ -372,7 +372,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         getLocationPermission();
         updateLocationUI();
         getDeviceLocation();
-        executeHttpRequestWithRetrofit(mLocation);
+        //executeHttpRequestWithRetrofit(mLocation);
         Log.e("test","onmapready");
 
 
