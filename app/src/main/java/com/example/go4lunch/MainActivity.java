@@ -32,12 +32,10 @@ import com.example.go4lunch.views.activities.RestaurantDetailActivity;
 import com.example.go4lunch.views.activities.SettingsActivity;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.libraries.places.api.Places;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -59,7 +57,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     // 2 - Identify each Http Request
     private static final int SIGN_OUT_TASK = 10;
     private static final int DELETE_USER_TASK = 20;
-    private static final int RC_SIGN_IN = 30;
+    private static final int RC_SIGN_IN = 123;
 
 
     @Override
@@ -72,12 +70,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     protected String getCurrentUserUid(){ return FirebaseAuth.getInstance().getCurrentUser().getUid(); }
 
     private void getUserInfoFromFirebase(){
-    UserHelper.getUser(getCurrentUserUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-        @Override
-        public void onSuccess(DocumentSnapshot documentSnapshot) {
-           currentUser = documentSnapshot.toObject(User.class);
-        }
-    });
+    UserHelper.getUser(getCurrentUserUid())
+            .addOnSuccessListener(documentSnapshot -> currentUser = documentSnapshot.toObject(User.class));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -87,8 +81,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         ButterKnife.bind(this);
         setContentView(R.layout.activity_main);
         Log.e("Tag", String.valueOf(LocalDateTime.now()));
-
-        Places.initialize(getApplicationContext(), String.valueOf(R.string.google_api_key));
         configureToolbar();
         configureNavigationVieW();
         configureDrawerLayout();
@@ -145,8 +137,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         View headerView = mNavigationView.getHeaderView(0);
         ImageView mUserPicture = headerView.findViewById(R.id.user_picture);
         if (this.getCurrentUser() != null) {
-            createUserInFirestore();
-
             //Get picture URL from Firebase
             if (this.getCurrentUser().getPhotoUrl() != null) {
                 Glide.with(this)
@@ -181,9 +171,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             Timestamp userCreationTimestamp = new Timestamp(date);
             String chosenRestaurant = null;
             Timestamp chosenRestaurantTimestamp = null;
+            String chosenRestaurantName = null;
 
 
-            UserHelper.createUser(uid, username, urlPicture,likes,userCreationTimestamp, null, null).addOnFailureListener(this.onFailureListener());
+            UserHelper.createUser(uid, username, urlPicture,likes,userCreationTimestamp, null, null, null).addOnFailureListener(this.onFailureListener());
         }
     }
 
@@ -211,6 +202,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             case R.id.nav_your_lunch:
                 if (checkUserRestaurant()){
                 Intent intent = new Intent(this, RestaurantDetailActivity.class);
+                intent.putExtra("placeID",currentUser.getChosenRestaurant());
                 startActivity(intent);
                     }else Toast.makeText(this,"Vous n'avez pas encore choisit de restaurant",Toast.LENGTH_LONG).show();
                 break;
