@@ -2,7 +2,6 @@ package com.example.go4lunch.views.fragments;
 
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,10 +22,12 @@ import com.bumptech.glide.Glide;
 import com.example.go4lunch.BuildConfig;
 import com.example.go4lunch.R;
 import com.example.go4lunch.adapters.PlacesAdapter;
+import com.example.go4lunch.api.UserHelper;
 import com.example.go4lunch.models.NearbySearch.NearbySearch;
 import com.example.go4lunch.models.PlaceAutocomplete.PlaceAutocomplete;
 import com.example.go4lunch.models.PlaceAutocomplete.Prediction;
 import com.example.go4lunch.models.PlaceDetail.PlaceDetail;
+import com.example.go4lunch.models.User;
 import com.example.go4lunch.presenters.Go4LunchStreams;
 import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.views.activities.RestaurantDetailActivity;
@@ -37,6 +38,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,8 +94,9 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
     int SEARCH_QUERY_THRESHOLD = 3;
 
     private List<Prediction> PredictionList;
+    private List<User> usersList = new ArrayList<>();
 
-    private LocationManager locationManager;
+
 
 
     /**
@@ -114,6 +117,8 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
         return fragment;
     }
 
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,6 +135,7 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
         ButterKnife.bind(this,view);
         setHasOptionsMenu(true);
         getDeviceLocation();
+        getUserList();
         this.configureRecyclerView();
         this.configureOnClickRecyclerView();
         return view;
@@ -164,7 +170,7 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
 
     public void configureRecyclerView(){
         mRestaurants = new ArrayList<>();
-        mAdapter = new PlacesAdapter(this.mRestaurants, Glide.with(this),mLatitude,mLongitude);
+        mAdapter = new PlacesAdapter(this.mRestaurants,usersList, Glide.with(this),mLatitude,mLongitude);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -184,7 +190,7 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
                 });
     }
 
-    private void executeHttpRequestWithRestrofitNearbyDetailRestaurant(String mLocation){
+    private void executeHttpRequestWithRetrofitNearbyDetailRestaurant(String mLocation){
         mDisposable = Go4LunchStreams.streamFetchRestaurantsDetails(mLocation,radius,type).subscribeWith(new DisposableSingleObserver<List<PlaceDetail>>() {
             @Override
             public void onSuccess(@NonNull List<PlaceDetail> placeDetails) {
@@ -244,6 +250,17 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
         });
     }
 
+    public void getUserList() {
+        UserHelper.getUsers().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                Log.e("Tag", String.valueOf(task.getResult().size()));
+                usersList = task.getResult().toObjects(User.class);
+                mAdapter.setUserList(usersList);
+            }
+        });
+    }
+
     private void executePlaceDetailRequestWithRetrofit(String placeId){
         mDisposable = Go4LunchStreams.streamFetchDetails(placeId).subscribeWith(new DisposableObserver<PlaceDetail>() {
             @Override
@@ -251,7 +268,7 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
                 Double latitude = placeDetail.getResult().getGeometry().getLocation().getLat();
                 Double longitude = placeDetail.getResult().getGeometry().getLocation().getLng();
                 String searchLocation = latitude + "," + longitude;
-                executeHttpRequestWithRetrofitDetail(searchLocation);
+                executeHttpRequestWithRetrofitNearbyDetailRestaurant(searchLocation);
 
             }
 
@@ -267,7 +284,6 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
         });
     }
     private void configureUiStarWithUserLikes(String placeId){
-
     }
 
     private void updateUiWithPlaceDetail(List<PlaceDetail> placeDetails){
@@ -297,7 +313,7 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
                             mAdapter.setUserLatitude(mLatitude);
                             mAdapter.setUserLongitude(mLongitude);
                             executeHttpRequestWithRetrofitDetail(mLocation);
-                            executeHttpRequestWithRestrofitNearbyDetailRestaurant(mLocation);
+                            executeHttpRequestWithRetrofitNearbyDetailRestaurant(mLocation);
                             Log.e("TAG", "Location/devicelocation" + mLocation);
 
                             if (lastKnownLocation != null) {
