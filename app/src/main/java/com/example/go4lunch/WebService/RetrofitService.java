@@ -1,4 +1,4 @@
-package com.example.go4lunch.apiService;
+package com.example.go4lunch.WebService;
 
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
