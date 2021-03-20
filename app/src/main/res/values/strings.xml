@@ -16,6 +16,11 @@
     <string name="nav_menu_list">List View</string>
     <string name="nav_menu_workmates">Workmates</string>
 
+    // Fragment Toolbar Title
+    <string name="toolbar_fragment_map">I\'m Hungry!</string>
+    <string name="toolbar_fragment_List">I\'m Hungry!</string>
+    <string name="toolbar_fragment_workmates">Available workmates</string>
+
     <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
     <string name="facebook_application_id" translatable="false">2826630187580441</string>
     <string name="facebook_login_protocol_scheme" translatable="false">fb2826630187580441</string>
@@ -66,8 +71,12 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
     <!-- WORKMATES FRAGMENT -->
-
+    <string name="restaurant_chosen">is eating at</string>
     <string name="no_restaurant_chosen">hasn\'t decided yet</string>
+
+    <!-- NOTIFICATION SERVICE -->
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+    <string name="notification_title">"Vous avez reçu une notification"</string>
 
 
     //Test
