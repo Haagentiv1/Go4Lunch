@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/bottom_nav_map"
         android:name="com.example.go4lunch.views.fragments.MapsFragment"
-        android:label="@string/nav_menu_map"
+        android:label="@string/toolbar_fragment_map"
         tools:layout="@layout/fragment_maps">
 
     </fragment>
@@ -16,7 +16,7 @@
     <fragment
         android:id="@+id/bottom_nav_list"
         android:name="com.example.go4lunch.views.fragments.ItemRestaurant"
-        android:label="@string/nav_menu_list"
+        android:label="@string/toolbar_fragment_List"
         tools:layout="@layout/fragment_item_list_restaurant">
 
     </fragment>
@@ -24,7 +24,7 @@
     <fragment
         android:id="@+id/bottom_nav_workmates"
         android:name="com.example.go4lunch.views.fragments.WorkMatesListFragment"
-        android:label="@string/nav_menu_workmates"
+        android:label="@string/toolbar_fragment_workmates"
         tools:layout="@layout/fragment_item_list_workmates">
 
     </fragment>
