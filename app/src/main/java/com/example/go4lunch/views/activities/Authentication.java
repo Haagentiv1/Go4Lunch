@@ -84,11 +84,6 @@ public class Authentication extends  BaseActivity {
             List<String> likes = new ArrayList<>();
             Date date = new Date();
             Timestamp userCreationTimestamp = new Timestamp(date);
-            String chosenRestaurant = null;
-            Timestamp chosenRestaurantTimestamp = null;
-            String chosenRestaurantName = null;
-
-
             UserHelper.createUser(uid, username, urlPicture,likes,userCreationTimestamp, null,null ,null).addOnFailureListener(this.onFailureListener());
         }
     }
