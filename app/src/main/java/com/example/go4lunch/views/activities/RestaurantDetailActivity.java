@@ -26,7 +26,6 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -46,7 +45,6 @@ import io.reactivex.rxjava3.observers.DisposableObserver;
 public class RestaurantDetailActivity extends AppCompatActivity {
 
     private String restaurantId;
-    private Disposable disposable;
 
     @BindView(R.id.detail_restaurant_picture)
     public ImageView restaurantPicture;
@@ -64,9 +62,8 @@ public class RestaurantDetailActivity extends AppCompatActivity {
     private String website;
     private List<String> userLikes = new ArrayList<>();
     private User currentUser;
-    private WorkMatesAdapter workMatesAdapter;
     private List<User> userList = new ArrayList<>();
-    private List<User> usersListRestaurant = new ArrayList<>();
+    private final List<User> usersListRestaurant = new ArrayList<>();
     private PlaceDetail currentPlaceDetail;
 
 
@@ -147,7 +144,7 @@ public class RestaurantDetailActivity extends AppCompatActivity {
 
 
     private void configureRecyclerView(){
-        this.workMatesAdapter = new WorkMatesAdapter(generateOptionsForAdapter(UserHelper.getAllUsersByRestaurant(restaurantId)), Glide.with(this));
+        WorkMatesAdapter workMatesAdapter = new WorkMatesAdapter(generateOptionsForAdapter(UserHelper.getAllUsersByRestaurant(restaurantId)), Glide.with(this));
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         recyclerView.setAdapter(workMatesAdapter);
     }
@@ -185,9 +182,9 @@ public class RestaurantDetailActivity extends AppCompatActivity {
     }
 
     private void executeHttpRequestForRetrievePlaceDetailData(){
-        disposable = Go4LunchStreams.streamFetchDetails(restaurantId).subscribeWith(new DisposableObserver<PlaceDetail>() {
+        Disposable disposable = Go4LunchStreams.streamFetchDetails(restaurantId).subscribeWith(new DisposableObserver<PlaceDetail>() {
             @Override
-            public void onNext(PlaceDetail placeDetail) {
+            public void onNext(@NotNull PlaceDetail placeDetail) {
                 currentPlaceDetail = placeDetail;
                 Result placeDetailResult = placeDetail.getResult();
                 bindPlaceDetailDataToView(placeDetailResult);
@@ -196,7 +193,7 @@ public class RestaurantDetailActivity extends AppCompatActivity {
 
             @Override
             public void onError(@NonNull Throwable e) {
-                Log.e("error","error" + e);
+                Log.e("error", "error" + e);
             }
 
             @Override
@@ -207,13 +204,10 @@ public class RestaurantDetailActivity extends AppCompatActivity {
     }
 
     public void getUserFromFirebaseDatabase(){
-        UserHelper.getUser(getCurrentUserUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                currentUser = documentSnapshot.toObject(User.class);
-                userLikes = currentUser.getLikes();
-                updateDrawableLikes();
-            }
+        UserHelper.getUser(getCurrentUserUid()).addOnSuccessListener(documentSnapshot -> {
+            currentUser = documentSnapshot.toObject(User.class);
+            userLikes = currentUser.getLikes();
+            updateDrawableLikes();
         });
     }
 
