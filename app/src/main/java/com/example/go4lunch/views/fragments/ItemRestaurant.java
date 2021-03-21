@@ -10,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.SearchView;
 
 import androidx.annotation.Nullable;
@@ -160,8 +161,12 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (newText.length() >= SEARCH_QUERY_THRESHOLD){
-                    executeAutocompleteRequestWithRetrofit(newText);
+                if (newText.length() >= SEARCH_QUERY_THRESHOLD) {
+                    //executeAutocompleteRequestWithRetrofit(newText);
+                    executeHttpRequestWithRetrofitAutocompleteAndPlaceDetail(newText);
+                    arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,test);
+
+
                 }
                 return true;
             }
@@ -204,6 +209,22 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
 
             }
         });
+    }
+
+    private void executeHttpRequestWithRetrofitAutocompleteAndPlaceDetail(String input){
+        mDisposable = Go4LunchStreams.streamFetchAutoCompleteRestaurantDetails(input,mLocation,radius).subscribeWith(new DisposableSingleObserver<List<PlaceDetail>>() {
+            @Override
+            public void onSuccess(@NonNull List<PlaceDetail> placeDetails) {
+                Log.e("Tag",placeDetails.get(0).getResult().getName());
+                updateUiWithPlaceDetail(placeDetails);
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+
+            }
+        });
+
     }
 
     private void executeHttpRequestWithRetrofitDetail(String mLocation){
