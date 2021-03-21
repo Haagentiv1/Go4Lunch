@@ -372,7 +372,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         getLocationPermission();
         updateLocationUI();
         getDeviceLocation();
-        //executeHttpRequestWithRetrofit(mLocation);
+        executeHttpRequestWithRetrofit(mLocation);
         Log.e("test","onmapready");
 
 
