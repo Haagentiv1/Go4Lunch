@@ -5,6 +5,7 @@ import com.example.go4lunch.WebService.RetrofitService;
 import com.example.go4lunch.models.NearbySearch.NearbySearch;
 import com.example.go4lunch.models.NearbySearch.Result;
 import com.example.go4lunch.models.PlaceAutocomplete.PlaceAutocomplete;
+import com.example.go4lunch.models.PlaceAutocomplete.Prediction;
 import com.example.go4lunch.models.PlaceDetail.PlaceDetail;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableSource;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -57,6 +59,23 @@ public class Go4LunchStreams {
                 return streamFetchDetails(result.getPlaceId());
             }
         }).toList().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public static Single<List<PlaceDetail>> streamFetchAutoCompleteRestaurantDetails(String input, String location, int radius){
+        return streamFetchAutocomplete(input, location, radius).flatMapIterable(new Function<PlaceAutocomplete, List<Prediction>>() {
+            @Override
+            public List<Prediction> apply(PlaceAutocomplete placeAutocomplete) throws Throwable {
+                return placeAutocomplete.getPredictions();
+            }
+        }).flatMap(new Function<Prediction, ObservableSource<PlaceDetail>>() {
+            @Override
+            public ObservableSource<PlaceDetail> apply(Prediction prediction) throws Throwable {
+                return streamFetchDetails(prediction.getPlaceId());
+            }
+        }).toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers
+                        .mainThread());
     }
 }
 
