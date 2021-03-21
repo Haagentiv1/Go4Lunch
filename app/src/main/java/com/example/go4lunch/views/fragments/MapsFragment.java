@@ -20,10 +20,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.models.NearbySearch.NearbySearch;
-import com.example.go4lunch.models.NearbySearch.Result;
-import com.example.go4lunch.models.PlaceAutocomplete.PlaceAutocomplete;
-import com.example.go4lunch.models.PlaceAutocomplete.Prediction;
 import com.example.go4lunch.models.PlaceDetail.PlaceDetail;
 import com.example.go4lunch.presenters.Go4LunchStreams;
 import com.example.go4lunch.views.activities.RestaurantDetailActivity;
@@ -38,12 +34,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +45,7 @@ import butterknife.BindString;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.observers.DisposableObserver;
+import io.reactivex.rxjava3.observers.DisposableSingleObserver;
 
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback, LocationSource.OnLocationChangedListener {
@@ -83,12 +75,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
     public String type;
     @BindInt(R.integer.radius)
     public int radius;
-
-    private Disposable mDisposable;
-    private List<Result> mRestaurants = new ArrayList<>();
-    private Marker mMarker;
+    private final List<PlaceDetail> mRestaurants = new ArrayList<>();
     private String mLocation;
-    private List<Prediction> mPredictionList;
     int SEARCH_QUERY_THRESHOLD = 3;
 
 
@@ -107,10 +95,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // Construct a FusedLocationProviderClient.
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
-
-        // Build the map.
         SupportMapFragment mMapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
         mMapFragment.getMapAsync(this);
@@ -140,7 +125,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
             @Override
             public boolean onQueryTextSubmit(String query) {
                 if (query.length() >= SEARCH_QUERY_THRESHOLD){
-                    // executeAutocompleteHttpRequestWithRetrofit(query);
+                    executeAutocompleteAndPlaceDetailRequestWithRetrofit(query);
 
                 }
                 return false;
@@ -149,7 +134,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (newText.length() >= SEARCH_QUERY_THRESHOLD){
-                    //executeAutocompleteHttpRequestWithRetrofit(newText);
+                    executeAutocompleteAndPlaceDetailRequestWithRetrofit(newText);
 
                 }
                 return true;
@@ -170,28 +155,25 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         try {
             if (locationPermissionGranted) {
                 Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
-                locationResult.addOnCompleteListener(getActivity(), new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if (task.isSuccessful()) {
-                            // Set the map's camera position to the current location of the device.
-                            lastKnownLocation = task.getResult();
-                            mLocation = lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude();
+                locationResult.addOnCompleteListener(getActivity(), task -> {
+                    if (task.isSuccessful()) {
+                        // Set the map's camera position to the current location of the device.
+                        lastKnownLocation = task.getResult();
+                        mLocation = lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude();
+                        Log.e("TAG", "Location/devicelocation" + mLocation);
+                        executeHttpRequestWithRetrofit(mLocation);
+                        if (lastKnownLocation != null) {
+                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                    new LatLng(lastKnownLocation.getLatitude(),
+                                            lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
                             Log.e("TAG", "Location/devicelocation" + mLocation);
-                            executeHttpRequestWithRetrofit(mLocation);
-                            if (lastKnownLocation != null) {
-                                map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                        new LatLng(lastKnownLocation.getLatitude(),
-                                                lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
-                                Log.e("TAG", "Location/devicelocation" + mLocation);
-                            }
-                        } else {
-                            Log.d(TAG, "Current location is null. Using defaults.");
-                            Log.e(TAG, "Exception: %s", task.getException());
-                            map.moveCamera(CameraUpdateFactory
-                                    .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
-                            map.getUiSettings().setMyLocationButtonEnabled(false);
                         }
+                    } else {
+                        Log.d(TAG, "Current location is null. Using defaults.");
+                        Log.e(TAG, "Exception: %s", task.getException());
+                        map.moveCamera(CameraUpdateFactory
+                                .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
+                        map.getUiSettings().setMyLocationButtonEnabled(false);
                     }
                 });
             }
@@ -243,7 +225,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
     }
 
 
-
     private void getLocationPermission() {
         /*
          * Request location permission, so that we can get the location of the
@@ -261,26 +242,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         }
     }
 
-    private void displayNearbyRestaurantMarker(List<Result> results){
+    private void displayNearbyRestaurantMarker(List<PlaceDetail> results){
         if (map != null) {
-            map.clear();
-            for (Result result : results) {
-                 MarkerOptions options = new MarkerOptions().position(new LatLng(result.getGeometry().getLocation().getLat(), result.getGeometry().getLocation().getLng()))
-                        .title(result.getName())
+            map.clear();}
+            for (PlaceDetail placeDetail : results) {
+                 MarkerOptions options = new MarkerOptions().position(new LatLng(placeDetail.getResult().getGeometry().getLocation().getLat(),placeDetail.getResult().getGeometry().getLocation().getLng()))
+                        .title(placeDetail.getResult().getName())
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.background_lunch));
-                 map.addMarker(options).setTag(result.getPlaceId());
-                 Log.e("testId","testid" + result.getPlaceId());
-                Log.e("testmarker","loc" + result.getGeometry().getLocation().getLat()+ result.getGeometry().getLocation().getLng());
-            }
+                 map.addMarker(options).setTag(placeDetail.getResult().getPlaceId());
 
-        }else {
-            for (Result result : results) {
-                MarkerOptions options = new MarkerOptions().position(new LatLng(result.getGeometry().getLocation().getLat(), result.getGeometry().getLocation().getLng()))
-                        .title(result.getName())
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.background_lunch));
-                map.addMarker(options).setTag(result.getId());
             }
-        }
         map.setOnInfoWindowClickListener(marker -> {
             String placeId = (String) marker.getTag();
             Intent intent = new Intent(getActivity(), RestaurantDetailActivity.class);
@@ -290,81 +261,33 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
 
     }
 
-
-
-    public void executeAutocompleteHttpRequestWithRetrofit(String query){
-        Disposable disposable = Go4LunchStreams.streamFetchAutocomplete(query,mLocation,radius).subscribeWith(new DisposableObserver<PlaceAutocomplete>() {
+    public void executeAutocompleteAndPlaceDetailRequestWithRetrofit(String query){
+        Disposable disposable = Go4LunchStreams.streamFetchAutoCompleteRestaurantDetails(query,mLocation,radius).subscribeWith(new DisposableSingleObserver<List<PlaceDetail>>() {
             @Override
-            public void onNext(@io.reactivex.rxjava3.annotations.NonNull PlaceAutocomplete placeAutocomplete) {
-                mPredictionList = placeAutocomplete.getPredictions();
-                Log.e("Tag",query + "test" + placeAutocomplete.getPredictions().get(0).getDescription());
-                String placeID = placeAutocomplete.getPredictions().get(0).getPlaceId();
-                executeHttpRequestForRetrievePlaceDetailData(placeID);
-
-            }
-            @Override
-            public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
-
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-        });
-    }
-
-    public void executeHttpRequestWithRetrofit(String location){
-        Log.e("TAG","LocationOnHttpRequest" + location);
-        Disposable disposable = Go4LunchStreams.streamFetchRestaurants(location,radius,type).subscribeWith(new DisposableObserver<NearbySearch>() {
-            @Override
-            public void onNext(@NotNull NearbySearch nearbySearch) {
-                Log.e("MapFragmentNearbyList","sizeList :" + nearbySearch.getResults().size());
-                mRestaurants.addAll(nearbySearch.getResults());
+            public void onSuccess(@NonNull List<PlaceDetail> placeDetails) {
+                mRestaurants.addAll(placeDetails);
                 displayNearbyRestaurantMarker(mRestaurants);
-                Log.e("TAG","RestaurantListInHttpRequest" + mRestaurants.size());
             }
 
             @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onComplete() {
+            public void onError(@NonNull Throwable e) {
 
             }
         });
     }
 
-    private void executeHttpRequestForRetrievePlaceDetailData(String placeID){
-        Disposable disposable = Go4LunchStreams.streamFetchDetails(placeID).subscribeWith(new DisposableObserver<PlaceDetail>() {
+    public void executeHttpRequestWithRetrofit(String mLocation){
+        Disposable disposable = Go4LunchStreams.streamFetchRestaurantsDetails(mLocation,radius,type).subscribeWith(new DisposableSingleObserver<List<PlaceDetail>>() {
             @Override
-            public void onNext(@io.reactivex.rxjava3.annotations.NonNull PlaceDetail placeDetail) {
-                Double latitude = placeDetail.getResult().getGeometry().getLocation().getLat();
-                Double longitude = placeDetail.getResult().getGeometry().getLocation().getLng();
-                String searchLocation = (latitude + "," + longitude);
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),DEFAULT_ZOOM));
-                executeHttpRequestWithRetrofit(searchLocation);
-
+            public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull List<PlaceDetail> placeDetails) {
+                displayNearbyRestaurantMarker(placeDetails);
             }
-
             @Override
             public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
-                Log.e("error","error" + e);
-
-            }
-
-            @Override
-            public void onComplete() {
 
             }
         });
-
     }
-
-
-
 
     @Override
     public void onMapReady(GoogleMap map) {
@@ -374,19 +297,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         getDeviceLocation();
         executeHttpRequestWithRetrofit(mLocation);
         Log.e("test","onmapready");
-
-
-
-
-
-        // Get the current location of the device and set the position of the map.
-
     }
 
     @Override
     public void onLocationChanged(Location location) {
-
-
 
         Log.e("onLocationChanged", "test" + location);
 
