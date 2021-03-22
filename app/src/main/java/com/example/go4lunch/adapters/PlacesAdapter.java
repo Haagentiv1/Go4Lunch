@@ -1,7 +1,6 @@
 package com.example.go4lunch.adapters;
 
 import android.location.Location;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,6 @@ import com.example.go4lunch.models.User;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -88,12 +86,15 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
             }
         }return howManyWorkmates;
     }
-    public void setOpeningHour(int position) {
+    public int setOpeningHour(int position) {
         if (placeDetailList.get(position).getResult().getOpeningHours() != null) {
-            Date date = new Date();
-            Log.e("Tag", String.valueOf(placeDetailList.get(position).getResult().getOpeningHours().getPeriods().get(0).getOpen().getTime()));
-            Log.e("TAG", placeDetailList.get(position).getResult().getOpeningHours().getWeekdayText().get(6));
+            if (placeDetailList.get(position).getResult().getOpeningHours().getOpenNow()){
+                return R.string.restaurant_open;
+            }
+            else return R.string.restaurant_close;
+
         }
+        return R.string.no_hour_data;
     }
 
 
@@ -111,13 +112,12 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        setOpeningHour(position);
         holder.mName.setText(placeDetailList.get(position).getResult().getName());
         holder.mAddress.setText(placeDetailList.get(position).getResult().getFormattedAddress());
         holder.mRating.setRating(divideRating(placeDetailList.get(position).getResult().getRating()));
         holder.mRestaurantDistance.setText(String.format("%sm", getDistanceBetweenUserLocationAndPlace(position)));
         holder.mRestaurantWorkmates.setText("(" + getHowManyWorkmatesForRestaurant(position) + ")");
-        //holder.mRestaurantOpenHour.setText(mPlaces.get(position).getOpeningHours().getOpenNow().toString());
+        holder.mRestaurantOpenHour.setText(setOpeningHour(position));
         if (placeDetailList.get(position).getResult().getPhotos() != null && !placeDetailList.get(position).getResult().getPhotos().isEmpty()){
             glide.load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + placeDetailList.get(position).getResult().getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.API_KEY).into(holder.mRestaurantPicture);
              }else {holder.mRestaurantPicture.setImageResource(R.drawable.image_not_available);}
