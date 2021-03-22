@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    android:id="@+id/list_restaurant_swipe"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools">
+
+
+<androidx.recyclerview.widget.RecyclerView
     android:id="@+id/list_restaurant"
     android:name="com.example.go4lunch.ItemFragment2"
     android:layout_width="match_parent"
@@ -11,3 +18,5 @@
     app:layoutManager="LinearLayoutManager"
     tools:context=".views.fragments.ItemRestaurant"
     tools:listitem="@layout/fragment_item_restaurant" />
+
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

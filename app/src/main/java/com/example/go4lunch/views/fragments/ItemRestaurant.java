@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
@@ -67,6 +68,8 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
     private boolean locationPermissionGranted = true;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private List<User> usersList = new ArrayList<>();
+    @BindView(R.id.list_restaurant_swipe)
+    public SwipeRefreshLayout swipeRefreshLayout;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -136,6 +139,12 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity().getApplicationContext(),DividerItemDecoration.VERTICAL));
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                executeHttpRequestWithRetrofitNearbyDetailRestaurant(mLocation);
+            }
+        });
     }
 
     private void configureOnClickRecyclerView(){
@@ -153,6 +162,9 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
             @Override
             public void onSuccess(@NonNull List<PlaceDetail> placeDetails) {
                 updateUiWithPlaceDetail(placeDetails);
+                if (swipeRefreshLayout.isRefreshing()){
+                    swipeRefreshLayout.setRefreshing(false);
+                }
             }
             @Override
             public void onError(@NonNull Throwable e) {
@@ -187,6 +199,7 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
         mAdapter.notifyDataSetChanged();
 
     }
+
     private void getDeviceLocation() {
         Log.e("tag","location getdevicelocation");
         /*
