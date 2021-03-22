@@ -21,13 +21,10 @@ public interface ApiService {
     @GET("details/json?key="+key)
     Observable<PlaceDetail> getPlaceDetails(@Query("place_id")String placeId);
 
-    @GET("autocomplete/json?types=establishment&key="+key)
+    @GET("autocomplete/json?types=establishment&strictbounds&key="+key)
     Observable<PlaceAutocomplete> getPlaceAutoComplete(@Query("input")String input,
                                                        @Query("location")String location,
                                                        @Query("radius")Integer radius);
-
-
-
 }
 
 
