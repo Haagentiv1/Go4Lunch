@@ -70,6 +70,12 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
+    <!-- Restaurant List Fragment -->
+
+    <string name="restaurant_open">Actually open</string>
+    <string name="restaurant_close">Actually closed</string>
+    <string name="no_hour_data">no data</string>
+
     <!-- WORKMATES FRAGMENT -->
     <string name="restaurant_chosen">is eating at</string>
     <string name="no_restaurant_chosen">hasn\'t decided yet</string>
@@ -89,5 +95,6 @@
     <string name="call">CALL</string>
     <string name="like">LIKE</string>
     <string name="website">WEBSITE</string>
+    <string name="actually">Actuellement ouvert</string>
 
 </resources>
