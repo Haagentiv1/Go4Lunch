@@ -248,7 +248,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
             for (PlaceDetail placeDetail : results) {
                  MarkerOptions options = new MarkerOptions().position(new LatLng(placeDetail.getResult().getGeometry().getLocation().getLat(),placeDetail.getResult().getGeometry().getLocation().getLng()))
                         .title(placeDetail.getResult().getName())
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.background_lunch));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_pin));
                  map.addMarker(options).setTag(placeDetail.getResult().getPlaceId());
 
             }
