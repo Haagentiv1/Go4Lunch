@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -128,12 +129,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         inflater.inflate(R.menu.search_view, menu);
         MenuItem item = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) item.getActionView();
+        searchView.setIconifiedByDefault(true);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 if (query.length() >= SEARCH_QUERY_THRESHOLD) {
                     executeAutocompleteAndPlaceDetailRequestWithRetrofit(query);
-
                 }
                 return false;
             }
@@ -290,12 +291,22 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         });
     }
 
+    private void displaySearchAutoCompleteResult(List<PlaceDetail>placeDetails){
+        if (!placeDetails.isEmpty()){
+            LatLng location = new LatLng(placeDetails.get(0).getResult().getGeometry().getLocation().getLat(),placeDetails.get(0).getResult().getGeometry().getLocation().getLng());
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(location,DEFAULT_ZOOM));
+            displayNearbyRestaurantMarker(placeDetails);
+        } else {
+            Toast.makeText(getActivity(), R.string.no_result_autocomplete ,Toast.LENGTH_LONG).show();
+        }
+    }
+
     public void executeAutocompleteAndPlaceDetailRequestWithRetrofit(String query) {
         Disposable disposable = Go4LunchStreams.streamFetchAutoCompleteRestaurantDetails(query, mLocation, radius).subscribeWith(new DisposableSingleObserver<List<PlaceDetail>>() {
             @Override
             public void onSuccess(@NonNull List<PlaceDetail> placeDetails) {
                 mRestaurants.addAll(placeDetails);
-                displayNearbyRestaurantMarker(mRestaurants);
+                displaySearchAutoCompleteResult(placeDetails);
             }
 
             @Override
@@ -318,6 +329,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
             }
         });
     }
+
 
     @Override
     public void onMapReady(GoogleMap map) {
