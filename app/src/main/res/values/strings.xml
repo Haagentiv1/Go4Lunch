@@ -96,5 +96,6 @@
     <string name="like">LIKE</string>
     <string name="website">WEBSITE</string>
     <string name="actually">Actuellement ouvert</string>
+    <string name="no_result_autocomplete">no result match in your area</string>
 
 </resources>
