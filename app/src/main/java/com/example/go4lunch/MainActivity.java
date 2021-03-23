@@ -191,9 +191,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     private Boolean checkUserRestaurant(){
-        if (currentUser.getChosenRestaurant() != null){
-            return true;
-        }else return false;
+        return currentUser.getChosenRestaurant() != null;
     }
 
     @Override
