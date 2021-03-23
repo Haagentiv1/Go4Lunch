@@ -56,9 +56,8 @@
             </intent-filter>
         </activity>
 
-        <meta-data
-            android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_application_id" />
+
+
 
 
         <service android:name=".notifications.NotificationService" >
@@ -68,6 +67,8 @@
         </service>
 
         <receiver android:name=".notifications.AlertReceiver"/>
+
+
     </application>
 
 </manifest>

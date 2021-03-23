@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Go4Lunch</string>
     <!-- Used in NavigationDrawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -22,8 +22,8 @@
     <string name="toolbar_fragment_workmates">Available workmates</string>
 
     <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
-    <string name="facebook_application_id" translatable="false">2826630187580441</string>
-    <string name="facebook_login_protocol_scheme" translatable="false">fb2826630187580441</string>
+    <string name="facebook_application_id">2826630187580441</string>
+    <string name="facebook_login_protocol_scheme">fb2826630187580441</string>
     <!-- Twitter consumer key and secret -->
     <string name="twitter_consumer_key" translatable="false">19274023</string>
     <string name="twitter_consumer_secret" translatable="false">iZg4dERcxefxlBPkmxgELw9J2taseixCWThU9b82iIK2A4PJZz</string>
