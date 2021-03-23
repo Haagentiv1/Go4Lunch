@@ -46,6 +46,10 @@ public class UserHelper {
         return UserHelper.getUsersCollection().get();
     }
 
+    public static Query getUsersWithReservedRestaurant(){
+        return UserHelper.getUsersCollection().whereNotEqualTo("chosenRestaurant",null);
+    }
+
 
 
    
