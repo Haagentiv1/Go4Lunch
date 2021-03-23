@@ -20,7 +20,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.api.UserHelper;
 import com.example.go4lunch.models.PlaceDetail.PlaceDetail;
+import com.example.go4lunch.models.User;
 import com.example.go4lunch.presenters.Go4LunchStreams;
 import com.example.go4lunch.views.activities.RestaurantDetailActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -35,7 +37,9 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +83,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
     private String mLocation;
     int SEARCH_QUERY_THRESHOLD = 3;
 
+    private List<User> userList;
+
 
     @Nullable
     @Override
@@ -101,16 +107,17 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         mMapFragment.getMapAsync(this);
 
     }
+
     @OnClick(R.id.FloatingLocationButton)
-    public void displayLocation(){
+    public void displayLocation() {
         getDeviceLocation();
     }
-
 
 
     @Override
     public void onStart() {
         super.onStart();
+        getUserList();
     }
 
 
@@ -124,7 +131,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if (query.length() >= SEARCH_QUERY_THRESHOLD){
+                if (query.length() >= SEARCH_QUERY_THRESHOLD) {
                     executeAutocompleteAndPlaceDetailRequestWithRetrofit(query);
 
                 }
@@ -133,7 +140,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (newText.length() >= SEARCH_QUERY_THRESHOLD){
+                if (newText.length() >= SEARCH_QUERY_THRESHOLD) {
                     executeAutocompleteAndPlaceDetailRequestWithRetrofit(newText);
 
                 }
@@ -182,7 +189,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         }
     }
 
-
+    private void getUserList() {
+        UserHelper.getUsersWithReservedRestaurant().get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                userList = queryDocumentSnapshots.toObjects(User.class);
+            }
+        });
+    }
 
 
     private void updateLocationUI() {
@@ -193,7 +207,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
             if (locationPermissionGranted) {
                 map.setMyLocationEnabled(true);
                 map.getUiSettings().setMyLocationButtonEnabled(false);
-                map.setMapStyle(MapStyleOptions.loadRawResourceStyle(getActivity().getApplicationContext(),R.raw.style_json));
+                map.setMapStyle(MapStyleOptions.loadRawResourceStyle(getActivity().getApplicationContext(), R.raw.style_json));
                 map.getUiSettings().setMapToolbarEnabled(false);
             } else {
                 map.setMyLocationEnabled(false);
@@ -201,7 +215,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
                 lastKnownLocation = null;
                 getLocationPermission();
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
@@ -242,27 +256,42 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         }
     }
 
-    private void displayNearbyRestaurantMarker(List<PlaceDetail> results){
-        if (map != null) {
-            map.clear();}
-            for (PlaceDetail placeDetail : results) {
-                 MarkerOptions options = new MarkerOptions().position(new LatLng(placeDetail.getResult().getGeometry().getLocation().getLat(),placeDetail.getResult().getGeometry().getLocation().getLng()))
-                        .title(placeDetail.getResult().getName())
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_pin));
-                 map.addMarker(options).setTag(placeDetail.getResult().getPlaceId());
-
+    public Boolean checkUserRestaurant(String restaurantId) {
+        for (User user : userList) {
+            if (user.getChosenRestaurant().equals(restaurantId)) {
+                return true;
             }
-        map.setOnInfoWindowClickListener(marker -> {
-            String placeId = (String) marker.getTag();
-            Intent intent = new Intent(getActivity(), RestaurantDetailActivity.class);
-            intent.putExtra("placeID",placeId);
-            startActivity(intent);
-        });
+        }
+        return false;
 
     }
 
-    public void executeAutocompleteAndPlaceDetailRequestWithRetrofit(String query){
-        Disposable disposable = Go4LunchStreams.streamFetchAutoCompleteRestaurantDetails(query,mLocation,radius).subscribeWith(new DisposableSingleObserver<List<PlaceDetail>>() {
+    private void displayNearbyRestaurantMarker(List<PlaceDetail> results) {
+        if (map != null) {
+            map.clear();
+        }
+        for (PlaceDetail placeDetail : results) {
+            MarkerOptions options = new MarkerOptions().position(new LatLng(placeDetail.getResult().getGeometry().getLocation().getLat(), placeDetail.getResult().getGeometry().getLocation().getLng()))
+                    .title(placeDetail.getResult().getName());
+            if (checkUserRestaurant(placeDetail.getResult().getPlaceId())) {
+                options.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_pin_green));
+            } else if (!checkUserRestaurant(placeDetail.getResult().getPlaceId())) {
+                options.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_pin));
+            }
+
+            map.addMarker(options).setTag(placeDetail.getResult().getPlaceId());
+
+        }
+        map.setOnInfoWindowClickListener(marker -> {
+            String placeId = (String) marker.getTag();
+            Intent intent = new Intent(getActivity(), RestaurantDetailActivity.class);
+            intent.putExtra("placeID", placeId);
+            startActivity(intent);
+        });
+    }
+
+    public void executeAutocompleteAndPlaceDetailRequestWithRetrofit(String query) {
+        Disposable disposable = Go4LunchStreams.streamFetchAutoCompleteRestaurantDetails(query, mLocation, radius).subscribeWith(new DisposableSingleObserver<List<PlaceDetail>>() {
             @Override
             public void onSuccess(@NonNull List<PlaceDetail> placeDetails) {
                 mRestaurants.addAll(placeDetails);
@@ -276,12 +305,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         });
     }
 
-    public void executeHttpRequestWithRetrofit(String mLocation){
-        Disposable disposable = Go4LunchStreams.streamFetchRestaurantsDetails(mLocation,radius,type).subscribeWith(new DisposableSingleObserver<List<PlaceDetail>>() {
+    public void executeHttpRequestWithRetrofit(String mLocation) {
+        Disposable disposable = Go4LunchStreams.streamFetchRestaurantsDetails(mLocation, radius, type).subscribeWith(new DisposableSingleObserver<List<PlaceDetail>>() {
             @Override
             public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull List<PlaceDetail> placeDetails) {
                 displayNearbyRestaurantMarker(placeDetails);
             }
+
             @Override
             public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
 
@@ -296,7 +326,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         updateLocationUI();
         getDeviceLocation();
         executeHttpRequestWithRetrofit(mLocation);
-        Log.e("test","onmapready");
+        Log.e("test", "onmapready");
     }
 
     @Override
