@@ -239,7 +239,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         getDeviceLocation();
     }
 
-
     private void getLocationPermission() {
         /*
          * Request location permission, so that we can get the location of the
@@ -256,6 +255,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
     }
+
+
 
     public Boolean checkUserRestaurant(String restaurantId) {
         for (User user : userList) {
