@@ -1,5 +1,8 @@
 package com.example.go4lunch.views.activities;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -23,13 +26,12 @@ import com.example.go4lunch.api.UserHelper;
 import com.example.go4lunch.models.PlaceDetail.PlaceDetail;
 import com.example.go4lunch.models.PlaceDetail.Result;
 import com.example.go4lunch.models.User;
+import com.example.go4lunch.notifications.AlertReceiver;
 import com.example.go4lunch.presenters.Go4LunchStreams;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -105,10 +107,17 @@ public class RestaurantDetailActivity extends AppCompatActivity {
         Timestamp restaurantReservationCreationTimestamp= new Timestamp(date);
         UserHelper.updateChosenRestaurantTimestamp(getCurrentUserUid(),restaurantReservationCreationTimestamp);
         UserHelper.updateChosenRestaurantName(getCurrentUserUid(),currentPlaceDetail.getResult().getName());
+        UserHelper.updateChosenRestaurantAddress(getCurrentUserUid(),currentPlaceDetail.getResult().getFormattedAddress());
+        setNotification();
     }
 
     public void setNotification(){
         if (notification){
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            Intent intent = new Intent(this, AlertReceiver.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this,0,intent,0);
+            alarmManager.setExact(AlarmManager.RTC, System.currentTimeMillis() +
+                    (5 * 1000),pendingIntent);
 
         }
 
@@ -120,12 +129,9 @@ public class RestaurantDetailActivity extends AppCompatActivity {
 
     public void getUsersWithThisRestaurant(){
         Log.e("Tag","test");
-        UserHelper.getAllUsersByRestaurant(restaurantId).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                Log.e("Tag","wrkm" + queryDocumentSnapshots.getDocuments().size());
-                List<User> userList1 =queryDocumentSnapshots.toObjects(User.class);
-            }
+        UserHelper.getAllUsersByRestaurant(restaurantId).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            Log.e("Tag","wrkm" + queryDocumentSnapshots.getDocuments().size());
+            List<User> userList1 =queryDocumentSnapshots.toObjects(User.class);
         });
 
     }
