@@ -45,6 +45,7 @@ public class Authentication extends  BaseActivity {
                         .setTheme(R.style.LoginTheme)
                         .setLogo(R.drawable.ic_hot_food_in_a_bowl__2_)
                         .setAvailableProviders(providers)
+                        .setIsSmartLockEnabled(false)
                         .build(),
                 RC_SIGN_IN);
         // [END auth_fui_create_intent]
@@ -84,7 +85,7 @@ public class Authentication extends  BaseActivity {
             List<String> likes = new ArrayList<>();
             Date date = new Date();
             Timestamp userCreationTimestamp = new Timestamp(date);
-            UserHelper.createUser(uid, username, urlPicture,likes,userCreationTimestamp, null,null ,null).addOnFailureListener(this.onFailureListener());
+            UserHelper.createUser(uid, username, urlPicture,likes,userCreationTimestamp, null,null ,null,null).addOnFailureListener(this.onFailureListener());
         }
     }
 

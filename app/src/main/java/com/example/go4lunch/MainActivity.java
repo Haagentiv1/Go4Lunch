@@ -174,7 +174,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             String chosenRestaurantName = null;
 
 
-            UserHelper.createUser(uid, username, urlPicture,likes,userCreationTimestamp, null, null, null).addOnFailureListener(this.onFailureListener());
+            UserHelper.createUser(uid, username, urlPicture,likes,userCreationTimestamp, null, null, null,null).addOnFailureListener(this.onFailureListener());
         }
     }
 
