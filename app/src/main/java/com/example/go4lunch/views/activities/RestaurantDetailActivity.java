@@ -1,6 +1,7 @@
 package com.example.go4lunch.views.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -65,6 +67,8 @@ public class RestaurantDetailActivity extends AppCompatActivity {
     private List<User> userList = new ArrayList<>();
     private final List<User> usersListRestaurant = new ArrayList<>();
     private PlaceDetail currentPlaceDetail;
+    private Boolean notification;
+
 
 
     @OnClick(R.id.detail_restaurant_callButton)
@@ -103,6 +107,13 @@ public class RestaurantDetailActivity extends AppCompatActivity {
         UserHelper.updateChosenRestaurantName(getCurrentUserUid(),currentPlaceDetail.getResult().getName());
     }
 
+    public void setNotification(){
+        if (notification){
+
+        }
+
+    }
+
 
     @Nullable
     protected String getCurrentUserUid(){ return FirebaseAuth.getInstance().getCurrentUser().getUid(); }
@@ -112,7 +123,7 @@ public class RestaurantDetailActivity extends AppCompatActivity {
         UserHelper.getAllUsersByRestaurant(restaurantId).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                Log.e("Tag","wrkm" + String.valueOf(queryDocumentSnapshots.getDocuments().size()));
+                Log.e("Tag","wrkm" + queryDocumentSnapshots.getDocuments().size());
                 List<User> userList1 =queryDocumentSnapshots.toObjects(User.class);
             }
         });
@@ -129,6 +140,9 @@ public class RestaurantDetailActivity extends AppCompatActivity {
         recoverDetailRestaurant();
         getUsersWithThisRestaurant();
         configureRecyclerView();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        notification = sharedPreferences.getBoolean("notification",false);
+
 
     }
 
