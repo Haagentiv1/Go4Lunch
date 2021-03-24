@@ -65,7 +65,7 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
     private String mLocation =   mLatitude + "," + mLongitude;
     private Disposable mDisposable;
     private Location lastKnownLocation;
-    private boolean locationPermissionGranted = true;
+    private final boolean locationPermissionGranted = true;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private List<User> usersList = new ArrayList<>();
     @BindView(R.id.list_restaurant_swipe)
@@ -162,6 +162,7 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
             @Override
             public void onSuccess(@NonNull List<PlaceDetail> placeDetails) {
                 updateUiWithPlaceDetail(placeDetails);
+                Log.e("tag",placeDetails.get(0).getResult().getAddressComponents().get(0).getLongName());
                 if (swipeRefreshLayout.isRefreshing()){
                     swipeRefreshLayout.setRefreshing(false);
                 }
