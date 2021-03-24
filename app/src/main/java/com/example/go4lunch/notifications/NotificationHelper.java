@@ -12,10 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.api.UserHelper;
 import com.example.go4lunch.models.User;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 public class NotificationHelper extends ContextWrapper{
 
@@ -23,11 +20,9 @@ public class NotificationHelper extends ContextWrapper{
     public static final String channelName = "channelName";
 
     private NotificationManager mManager;
-    private User currentUser;
 
     public NotificationHelper(Context base) {
         super(base);
-         getCurrentUserFromFirebase();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             createChannel();
         }
@@ -46,23 +41,20 @@ public class NotificationHelper extends ContextWrapper{
         return mManager;
     }
 
-    @Nullable
-    protected FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
-
-    public void getCurrentUserFromFirebase(){
-        UserHelper.getUser(getCurrentUser().getUid()).addOnSuccessListener(documentSnapshot -> {
-            currentUser = documentSnapshot.toObject(User.class);
-            Log.e("Tag",currentUser.getUsername());
-        });
-    }
 
 
 
-    public NotificationCompat.Builder getChannelNotification(){
+
+    public NotificationCompat.Builder getChannelNotification(User user,@Nullable String userList){
         Log.e("Tag","channelNotif");
+        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle()
+                .setBigContentTitle(user.getChosenRestaurantName())
+                .addLine(user.getChosenRestaurantAddress())
+                .addLine(userList);
         return new NotificationCompat.Builder(getApplicationContext(),channelID)
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText("Le Zinc")
+                .setContentTitle(getString(R.string.notification_title))
+                .setStyle(inboxStyle)
+                .setAutoCancel(true)
                 .setSmallIcon(R.drawable.ic_hot_food_in_a_bowl__2_);
     }
 }
