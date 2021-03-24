@@ -1,5 +1,6 @@
 package com.example.go4lunch.adapters;
 
+import android.annotation.SuppressLint;
 import android.location.Location;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -110,6 +111,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
     }
 
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mName.setText(placeDetailList.get(position).getResult().getName());
