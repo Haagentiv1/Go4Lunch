@@ -15,6 +15,7 @@ public class User {
     private List<String> likes;
     private Timestamp userCreationTimestamp;
     private String chosenRestaurant;
+    private String chosenRestaurantAddress;
     private Timestamp chosenRestaurantTimestamp;
     private String chosenRestaurantName;
     public User(){ }
@@ -22,7 +23,9 @@ public class User {
 
 
 
-    public User(String uid, String username, @Nullable String urlPicture, List<String> likes, Timestamp userCreationTimestamp, String chosenRestaurant, String chosenRestaurantName, Timestamp chosenRestaurantTimestamp){
+
+
+    public User(String uid, String username, @Nullable String urlPicture, List<String> likes, Timestamp userCreationTimestamp, String chosenRestaurant, String chosenRestaurantName, Timestamp chosenRestaurantTimestamp, String chosenRestaurantAddress){
         this.uid = uid;
         this.username = username;
         this.urlPicture = urlPicture;
@@ -31,6 +34,7 @@ public class User {
         this.chosenRestaurant = chosenRestaurant;
         this.chosenRestaurantName = chosenRestaurantName;
         this.userCreationTimestamp = chosenRestaurantTimestamp;
+        this.chosenRestaurantAddress = chosenRestaurantAddress;
     }
 
     // --- GETTERS ---
@@ -44,6 +48,7 @@ public class User {
     public String getChosenRestaurant() { return chosenRestaurant; }
     public String getChosenRestaurantName() {return chosenRestaurantName;}
     public Timestamp getChosenRestaurantTimestamp() { return chosenRestaurantTimestamp; }
+    public String getChosenRestaurantAddress() { return chosenRestaurantAddress; }
 
 
     // --- SETTERS ---
@@ -56,5 +61,6 @@ public class User {
     public void setChosenRestaurant(String chosenRestaurant) { this.chosenRestaurant = chosenRestaurant; }
     public void setChosenRestaurantTimestamp(Timestamp chosenRestaurantTimestamp) { this.chosenRestaurantTimestamp = chosenRestaurantTimestamp; }
     public void setChosenRestaurantName (String chosenRestaurantName){this.chosenRestaurantName = chosenRestaurantName;}
+    public void setChosenRestaurantAddress(String chosenRestaurantAddress) { this.chosenRestaurantAddress = chosenRestaurantAddress; }
 
 }
