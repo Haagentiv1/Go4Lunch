@@ -47,32 +47,19 @@ public class Go4LunchStreams {
     }
 
     public static  Single<List<PlaceDetail>> streamFetchRestaurantsDetails(String location, int radius, String type) {
-        return streamFetchRestaurants(location, radius, type).flatMapIterable(new Function<NearbySearch, List<Result>>() {
-
-            @Override
-            public List<Result> apply(NearbySearch nearbySearch) throws Throwable {
-                return nearbySearch.getResults();
-            }
-        }).flatMap(new Function<Result, Observable<PlaceDetail>>() {
-            @Override
-            public Observable<PlaceDetail> apply(Result result) throws Throwable {
-                return streamFetchDetails(result.getPlaceId());
-            }
-        }).toList().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return streamFetchRestaurants(location, radius, type)
+                .flatMapIterable((Function<NearbySearch, List<Result>>) NearbySearch::getResults)
+                .flatMap((Function<Result, Observable<PlaceDetail>>) result -> streamFetchDetails(result.getPlaceId()))
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers
+                        .mainThread());
     }
 
     public static Single<List<PlaceDetail>> streamFetchAutoCompleteRestaurantDetails(String input, String location, int radius){
-        return streamFetchAutocomplete(input, location, radius).flatMapIterable(new Function<PlaceAutocomplete, List<Prediction>>() {
-            @Override
-            public List<Prediction> apply(PlaceAutocomplete placeAutocomplete) throws Throwable {
-                return placeAutocomplete.getPredictions();
-            }
-        }).flatMap(new Function<Prediction, ObservableSource<PlaceDetail>>() {
-            @Override
-            public ObservableSource<PlaceDetail> apply(Prediction prediction) throws Throwable {
-                return streamFetchDetails(prediction.getPlaceId());
-            }
-        }).toList()
+        return streamFetchAutocomplete(input, location, radius).flatMapIterable((Function<PlaceAutocomplete, List<Prediction>>) PlaceAutocomplete::getPredictions)
+                .flatMap((Function<Prediction, ObservableSource<PlaceDetail>>) prediction -> streamFetchDetails(prediction.getPlaceId()))
+                .toList()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers
                         .mainThread());
