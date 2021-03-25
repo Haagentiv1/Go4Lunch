@@ -1,6 +1,7 @@
 package com.example.go4lunch.adapters;
 
 import android.annotation.SuppressLint;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +36,9 @@ public class WorkMatesAdapter extends FirestoreRecyclerAdapter<User,WorkMatesAda
         super(options);
         this.glide = glide;
     }
+    public Boolean checkUserRestaurant(User user){
+       return user.getChosenRestaurant() != null;
+    }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -46,8 +50,16 @@ public class WorkMatesAdapter extends FirestoreRecyclerAdapter<User,WorkMatesAda
     @SuppressLint("SetTextI18n")
     @Override
     protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull User model) {
-        String string = holder.workmateRestaurantChoice.getContext().getString(R.string.restaurant_chosen);
-        holder.workmateRestaurantChoice.setText(model.getUsername() + string + model.getChosenRestaurantName());
+        String restaurantChosen = holder.workmateRestaurantChoice.getContext().getString(R.string.restaurant_chosen);
+        String noRestaurant = holder.workmateRestaurantChoice.getContext().getString(R.string.no_restaurant_chosen);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!checkUserRestaurant(model)){
+            holder.workmateRestaurantChoice.setText(model.getUsername() + " " + noRestaurant);
+            holder.workmateRestaurantChoice.setTextAppearance(R.style.NoRestaurantChosen);}
+            else {
+                holder.workmateRestaurantChoice.setText(String.format("%s %s %s", model.getUsername(), restaurantChosen, model.getChosenRestaurantName()));
+            }
+        }
         glide.load(model.getUrlPicture()).circleCrop().into(holder.workmatesPicture);
     }
 
