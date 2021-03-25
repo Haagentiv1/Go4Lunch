@@ -34,13 +34,9 @@ import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 import butterknife.ButterKnife;
@@ -160,28 +156,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     }
 
-    private void createUserInFirestore(){
-        if (this.getCurrentUser() != null){
-            String urlPicture = (this.getCurrentUser().getPhotoUrl() != null) ?
-                    this.getCurrentUser().getPhotoUrl().toString() : null;
-            String username = this.getCurrentUser().getDisplayName();
-            String uid = this.getCurrentUser().getUid();
-            List<String> likes = new ArrayList<>();
-            Date date = new Date();
-            Timestamp userCreationTimestamp = new Timestamp(date);
-            String chosenRestaurant = null;
-            Timestamp chosenRestaurantTimestamp = null;
-            String chosenRestaurantName = null;
 
-
-            UserHelper.createUser(uid, username, urlPicture,likes,userCreationTimestamp, null, null, null,null).addOnFailureListener(this.onFailureListener());
-        }
-    }
 
     private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data){
         if (requestCode == RC_SIGN_IN){
             if (resultCode == RESULT_OK){
-                this.createUserInFirestore();
             }
         }
     }
