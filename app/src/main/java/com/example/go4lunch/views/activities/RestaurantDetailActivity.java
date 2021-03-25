@@ -38,6 +38,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -125,7 +126,7 @@ public class RestaurantDetailActivity extends AppCompatActivity {
 
 
     @Nullable
-    protected String getCurrentUserUid(){ return FirebaseAuth.getInstance().getCurrentUser().getUid(); }
+    protected String getCurrentUserUid(){ return Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid(); }
 
     public void getUsersWithThisRestaurant(){
         Log.e("Tag","test");
