@@ -56,8 +56,7 @@ dependencies {
     // ...
     implementation platform('com.google.firebase:firebase-bom:26.5.0')
     // Authentication dependency
-    implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
-    implementation 'com.google.firebase:firebase-auth:20.0.3'
+    implementation 'com.firebaseui:firebase-ui-auth:7.1.1'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.google.firebase:firebase-firestore'
     implementation 'com.firebaseui:firebase-ui-firestore:7.1.1'
@@ -70,15 +69,14 @@ dependencies {
 
     // Required only if Twitter login support is required
         // Find the latest Twitter SDK releases here: https://goo.gl/E5wZvQ
-    implementation 'com.twitter.sdk.android:twitter-core:3.1.1'
     //GOOGLE
     implementation 'com.google.android.gms:play-services-auth:19.0.0'
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation 'com.google.android.gms:play-services-location:18.0.0'
 
     //GLIDE
-    implementation 'com.github.bumptech.glide:glide:4.11.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
 
     // Google Place SDK
     implementation 'com.google.android.libraries.places:places:2.4.0'
@@ -103,7 +101,7 @@ dependencies {
 
     //RXJAVA3
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
-    implementation 'io.reactivex.rxjava3:rxjava:3.0.9'
+    implementation 'io.reactivex.rxjava3:rxjava:3.0.11'
 
 
 }
