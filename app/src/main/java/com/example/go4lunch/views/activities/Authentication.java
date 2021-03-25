@@ -32,6 +32,7 @@ public class Authentication extends  BaseActivity {
     private static final int RC_SIGN_IN = 123;
     private List<User> userList = new ArrayList<>();
 
+
     public void createSignInIntent() {
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.GoogleBuilder().build(),
@@ -45,7 +46,6 @@ public class Authentication extends  BaseActivity {
                         .setTheme(R.style.LoginTheme)
                         .setLogo(R.drawable.ic_hot_food_in_a_bowl__2_)
                         .setAvailableProviders(providers)
-                        .setIsSmartLockEnabled(false)
                         .build(),
                 RC_SIGN_IN);
         // [END auth_fui_create_intent]
@@ -62,7 +62,6 @@ public class Authentication extends  BaseActivity {
             if (resultCode == RESULT_OK) {
                 Log.e("Tag","ResultOK");
                 // Successfully signed in
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 createUserInFirestore();
                 Intent intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
