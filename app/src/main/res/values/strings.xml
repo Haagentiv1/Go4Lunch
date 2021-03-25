@@ -76,7 +76,7 @@
     <string name="no_hour_data">no data</string>
 
     <!-- WORKMATES FRAGMENT -->
-    <string name="restaurant_chosen">is eating at</string>
+    <string name="restaurant_chosen">eat at</string>
     <string name="no_restaurant_chosen">hasn\'t decided yet</string>
 
     <!-- NOTIFICATION SERVICE -->
