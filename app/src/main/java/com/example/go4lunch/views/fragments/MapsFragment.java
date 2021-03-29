@@ -1,8 +1,11 @@
 package com.example.go4lunch.views.fragments;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.location.LocationManagerCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.go4lunch.R;
@@ -26,8 +30,14 @@ import com.example.go4lunch.models.PlaceDetail.PlaceDetail;
 import com.example.go4lunch.models.User;
 import com.example.go4lunch.presenters.Go4LunchStreams;
 import com.example.go4lunch.views.activities.RestaurantDetailActivity;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
@@ -70,6 +80,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean locationPermissionGranted;
+    private static final int REQUEST_CHECK_SETTINGS = 111;
 
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
@@ -83,6 +94,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
     private final List<PlaceDetail> mRestaurants = new ArrayList<>();
     private String mLocation;
     int SEARCH_QUERY_THRESHOLD = 3;
+
 
     private List<User> userList;
 
@@ -167,10 +179,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
                     if (task.isSuccessful()) {
                         // Set the map's camera position to the current location of the device.
                         lastKnownLocation = task.getResult();
-                        mLocation = lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude();
-                        Log.e("TAG", "Location/devicelocation" + mLocation);
-                        executeHttpRequestWithRetrofit(mLocation);
                         if (lastKnownLocation != null) {
+                            mLocation = lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude();
+                            executeHttpRequestWithRetrofit(mLocation);
                             map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                     new LatLng(lastKnownLocation.getLatitude(),
                                             lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
@@ -239,12 +250,69 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         getDeviceLocation();
     }
 
+    private static Boolean isLocationEnabled(Context context){
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        return LocationManagerCompat.isLocationEnabled(locationManager);
+    }
+
+    private void GpsRequest(){
+        // https://stackoverflow.com/questions/9928256/how-to-turn-on-the-gps-on-android/64757407#64757407
+        if(!isLocationEnabled(getContext())){
+            LocationRequest locationRequest = LocationRequest.create();
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                    .addLocationRequest(locationRequest);
+
+            builder.setAlwaysShow(true); //this displays dialog box like Google Maps with two buttons - OK and NO,THANKS
+
+            Task<LocationSettingsResponse> task =
+                    LocationServices.getSettingsClient(getContext()).checkLocationSettings(builder.build());
+
+            task.addOnCompleteListener(task1 -> {
+                try {
+                    LocationSettingsResponse response = task1.getResult(ApiException.class);
+                    // All location settings are satisfied. The client can initialize location
+                    // requests here.
+                } catch (ApiException exception) {
+                    switch (exception.getStatusCode()) {
+                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                            // Location settings are not satisfied. But could be fixed by showing the
+                            // user a dialog.
+                            try {
+                                // Cast to a resolvable exception.
+                                ResolvableApiException resolvable = (ResolvableApiException) exception;
+                                // Show the dialog by calling startResolutionForResult(),
+                                // and check the result in onActivityResult().
+                                resolvable.startResolutionForResult(
+                                        getActivity(),
+                                        REQUEST_CHECK_SETTINGS);
+                            } catch (IntentSender.SendIntentException e) {
+                                // Ignore the error.
+                            } catch (ClassCastException e) {
+                                // Ignore, should be an impossible error.
+                            }
+                            break;
+                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                            // Location settings are not satisfied. However, we have no way to fix the
+                            // settings so we won't show the dialog.
+                            break;
+                    }
+                }
+            });
+        } else {
+            Toast.makeText(getContext(), "GPS is already Enabled!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
     private void getLocationPermission() {
+        Log.e("Tag","locationStatut" + isLocationEnabled(getContext()));
         /*
          * Request location permission, so that we can get the location of the
          * device. The result of the permission request is handled by a callback,
          * onRequestPermissionsResult.
          */
+        GpsRequest();
         if (ContextCompat.checkSelfPermission(getActivity(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
