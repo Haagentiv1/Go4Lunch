@@ -214,16 +214,13 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
                     if (task.isSuccessful()) {
                         // Set the map's camera position to the current location of the device.
                         lastKnownLocation = task.getResult();
-                        mLocation = lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude();
-                        mLatitude = lastKnownLocation.getLatitude();
-                        mLongitude = lastKnownLocation.getLongitude();
-                        mAdapter.setUserLatitude(mLatitude);
-                        mAdapter.setUserLongitude(mLongitude);
-                        executeHttpRequestWithRetrofitNearbyDetailRestaurant(mLocation);
-                        Log.e("TAG", "Location/devicelocation" + mLocation);
-
                         if (lastKnownLocation != null) {
-
+                            mLocation = lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude();
+                            mLatitude = lastKnownLocation.getLatitude();
+                            mLongitude = lastKnownLocation.getLongitude();
+                            mAdapter.setUserLatitude(mLatitude);
+                            mAdapter.setUserLongitude(mLongitude);
+                            executeHttpRequestWithRetrofitNearbyDetailRestaurant(mLocation);
                             Log.e("TAG", "Location/devicelocation" + mLocation);
                         }
                     } else {
@@ -239,7 +236,6 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
     }
     @Override
     public void onLocationChanged(Location location) {
-        mLocation = location.getLatitude() + "," + location.getLongitude();
         Log.e("TAG","onLocationChanged" + mLocation);
     }
 
