@@ -256,8 +256,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
     }
 
     private void GpsRequest(){
-        // https://stackoverflow.com/questions/9928256/how-to-turn-on-the-gps-on-android/64757407#64757407
-        if(!isLocationEnabled(getContext())){
+        //  https://developers.google.com/android/reference/com/google/android/gms/location/SettingsClient
+         if(!isLocationEnabled(getContext())){
             LocationRequest locationRequest = LocationRequest.create();
             locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
             LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
