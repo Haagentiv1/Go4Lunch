@@ -16,7 +16,9 @@ import com.bumptech.glide.RequestManager;
 import com.example.go4lunch.BuildConfig;
 import com.example.go4lunch.R;
 import com.example.go4lunch.models.PlaceDetail.PlaceDetail;
+import com.example.go4lunch.models.PlaceDetail.Result;
 import com.example.go4lunch.models.User;
+import com.example.go4lunch.utils.PlaceAdapterUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -31,33 +33,22 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
     private final List<PlaceDetail> placeDetailList;
     private List<User> userList;
     private final RequestManager glide;
-    private Double userLatitude;
-    private Double userLongitude;
-    private final Location userLocation = new Location("");
-    private final Location placeLocation = new Location("");
+    private Location userLocation;
 
-    public PlacesAdapter(@NonNull List<PlaceDetail> places, List<User> userList, RequestManager glide, Double userLatitude, Double userLongitude) {
+    public PlacesAdapter(@NonNull List<PlaceDetail> places, List<User> userList, RequestManager glide, Location userLocation) {
         this.placeDetailList = places;
         this.glide = glide;
-        this.userLatitude = userLatitude;
-        this.userLongitude = userLongitude;
         this.userList = userList;
+        this.userLocation = userLocation;
     }
     public void setUserList(List<User> userList){
         this.userList = userList;
     }
 
-    public void setUserLatitude(Double userLatitude){
-        this.userLatitude = userLatitude;
+    public void setUserLocation(Location location){
+        this.userLocation = location;
+
     }
-
-    public void setUserLongitude(Double userLongitude) {
-        this.userLongitude = userLongitude;
-    }
-
-
-
-
     @NotNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -70,56 +61,16 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
         return this.placeDetailList.get(position).getResult().getPlaceId();
     }
 
-    public float divideRating(Double rating){
-        if (rating == null){
-            return 0;
-        }
-        else return (float) ((rating / 5) * 3);
-    }
-
-    public int getHowManyWorkmatesForRestaurant(int position){
-        int howManyWorkmates = 0;
-        for (User user : userList){
-            if (user.getChosenRestaurant() != null){
-            if (user.getChosenRestaurant().equals(placeDetailList.get(position).getResult().getPlaceId())){
-                howManyWorkmates += 1;
-            }
-            }
-        }return howManyWorkmates;
-    }
-    public int setOpeningHour(int position) {
-        if (placeDetailList.get(position).getResult().getOpeningHours() != null) {
-            if (placeDetailList.get(position).getResult().getOpeningHours().getOpenNow()){
-                return R.string.restaurant_open;
-            }
-            else return R.string.restaurant_close;
-
-        }
-        return R.string.no_hour_data;
-    }
-
-
-
-
-    public String getDistanceBetweenUserLocationAndPlace(int adapterPosition){
-        userLocation.setLatitude(userLatitude);
-        userLocation.setLongitude(userLongitude);
-        placeLocation.setLatitude(placeDetailList.get(adapterPosition).getResult().getGeometry().getLocation().getLat());
-        placeLocation.setLongitude(placeDetailList.get(adapterPosition).getResult().getGeometry().getLocation().getLng());
-        float distanceInMeter = userLocation.distanceTo(placeLocation);
-        return String.valueOf(Math.round(distanceInMeter));
-    }
-
-
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
+        Result placeDetail = placeDetailList.get(position).getResult();
         holder.mName.setText(placeDetailList.get(position).getResult().getName());
         holder.mAddress.setText(placeDetailList.get(position).getResult().getFormattedAddress());
-        holder.mRating.setRating(divideRating(placeDetailList.get(position).getResult().getRating()));
-        holder.mRestaurantDistance.setText(String.format("%sm", getDistanceBetweenUserLocationAndPlace(position)));
-        holder.mRestaurantWorkmates.setText("(" + getHowManyWorkmatesForRestaurant(position) + ")");
-        holder.mRestaurantOpenHour.setText(setOpeningHour(position));
+        holder.mRating.setRating(PlaceAdapterUtil.divideRestaurantRatingBy3(userList,placeDetail));
+        holder.mRestaurantDistance.setText( String.format("%sm",PlaceAdapterUtil.getPositionBetweenPlaceAndUSer(userLocation,placeDetail)));
+        holder.mRestaurantWorkmates.setText(String.format("(%s)", PlaceAdapterUtil.howManyWorkmatesEatAtThisRestaurant(userList, placeDetail)));
+        holder.mRestaurantOpenHour.setText(PlaceAdapterUtil.getOpeningHourString(placeDetail));
         if (placeDetailList.get(position).getResult().getPhotos() != null && !placeDetailList.get(position).getResult().getPhotos().isEmpty()){
             glide.load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + placeDetailList.get(position).getResult().getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.API_KEY).into(holder.mRestaurantPicture);
              }else {holder.mRestaurantPicture.setImageResource(R.drawable.image_not_available);}
