@@ -70,6 +70,7 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
     private List<User> usersList = new ArrayList<>();
     @BindView(R.id.list_restaurant_swipe)
     public SwipeRefreshLayout swipeRefreshLayout;
+    private Location userLocation;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -134,7 +135,7 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
 
     public void configureRecyclerView(){
         mRestaurants = new ArrayList<>();
-        mAdapter = new PlacesAdapter(this.mRestaurants,usersList, Glide.with(this),mLatitude,mLongitude);
+        mAdapter = new PlacesAdapter(this.mRestaurants,usersList, Glide.with(this),userLocation);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -218,8 +219,7 @@ public class ItemRestaurant extends Fragment implements LocationSource.OnLocatio
                             mLocation = lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude();
                             mLatitude = lastKnownLocation.getLatitude();
                             mLongitude = lastKnownLocation.getLongitude();
-                            mAdapter.setUserLatitude(mLatitude);
-                            mAdapter.setUserLongitude(mLongitude);
+                            mAdapter.setUserLocation(lastKnownLocation);
                             executeHttpRequestWithRetrofitNearbyDetailRestaurant(mLocation);
                             Log.e("TAG", "Location/devicelocation" + mLocation);
                         }
